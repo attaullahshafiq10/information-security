@@ -652,6 +652,78 @@ html[data-theme="dark"] .archive-list .ext-badge.pptx { background:#352510; colo
       </ul>
     </div>
 
+    <div class="archive-section">
+      <button class="archive-toggle" id="afterMidsToggle" aria-expanded="false">
+        📂 After-Mids Slides
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <ul class="archive-list" id="afterMidsList">
+        <li>
+          <a href="file cloud and cyberthreats.pdf" target="_blank">
+            <span class="week-no">WK 9</span>
+            <span class="week-name">Malwares &amp; Cyber Threats</span>
+            <span class="ext-badge pdf">PDF</span>
+          </a>
+        </li>
+        <li>
+          <a href="file Digital Signature.ppt" target="_blank">
+            <span class="week-no">WK 10</span>
+            <span class="week-name">Digital Signature</span>
+            <span class="ext-badge ppt">PPT</span>
+          </a>
+        </li>
+        <li>
+          <a href="file Authentication ans its Vulnerabilities.pptx" target="_blank">
+            <span class="week-no">WK 11-13</span>
+            <span class="week-name">Auth &amp; Vulnerabilities</span>
+            <span class="ext-badge pptx">PPTX</span>
+          </a>
+        </li>
+        <li>
+          <a href="file User Authentication.pdf" target="_blank">
+            <span class="week-no">WK 11-13</span>
+            <span class="week-name">User Authentication</span>
+            <span class="ext-badge pdf">PDF</span>
+          </a>
+        </li>
+        <li>
+          <a href="file Message Authentication.ppt" target="_blank">
+            <span class="week-no">WK 11-13</span>
+            <span class="week-name">Message Authentication</span>
+            <span class="ext-badge ppt">PPT</span>
+          </a>
+        </li>
+        <li>
+          <a href="file Database Security.pdf" target="_blank">
+            <span class="week-no">WK 14</span>
+            <span class="week-name">Database Security</span>
+            <span class="ext-badge pdf">PDF</span>
+          </a>
+        </li>
+        <li>
+          <a href="file TLS-SSL.ppt" target="_blank">
+            <span class="week-no">WK 15</span>
+            <span class="week-name">Communication Security</span>
+            <span class="ext-badge ppt">PPT</span>
+          </a>
+        </li>
+        <li>
+          <a href="file Firewall & VPN (1).pptx" target="_blank">
+            <span class="week-no">WK 16</span>
+            <span class="week-name">Network Security (VPN)</span>
+            <span class="ext-badge pptx">PPTX</span>
+          </a>
+        </li>
+        <li>
+          <a href="file IDS.pptx" target="_blank">
+            <span class="week-no">WK 16</span>
+            <span class="week-name">Network Security (IDS)</span>
+            <span class="ext-badge pptx">PPTX</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
     <a href="classwork.pdf" target="_blank" class="classwork-link">
       📄 <span style="flex:1;">Class Work PDF</span>
       <span class="ext-badge pdf" style="font-size:9px;">PDF</span>
@@ -2640,6 +2712,17 @@ html[data-theme="dark"] .archive-list .ext-badge.pptx { background:#352510; colo
       var isOpen = preMidsList.classList.toggle("open");
       preMidsToggle.classList.toggle("open", isOpen);
       preMidsToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+  }
+
+  /* ---------- after-mids accordion ---------- */
+  var afterMidsToggle = document.getElementById("afterMidsToggle");
+  var afterMidsList = document.getElementById("afterMidsList");
+  if(afterMidsToggle && afterMidsList){
+    afterMidsToggle.addEventListener("click", function(){
+      var isOpen = afterMidsList.classList.toggle("open");
+      afterMidsToggle.classList.toggle("open", isOpen);
+      afterMidsToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
     });
   }
 
