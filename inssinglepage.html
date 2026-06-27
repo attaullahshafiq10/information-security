@@ -1,0 +1,2538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>INFOSEC DOSSIER — Study Notes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   TOKENS
+   ============================================================ */
+:root{
+  --ink:#1c2420;
+  --ink-soft:#445049;
+  --paper:#eef1e8;
+  --paper-raised:#ffffff;
+  --line:#cdd2c2;
+  --signal:#146356;
+  --signal-soft:#e3ede9;
+  --stamp:#a8762b;
+  --stamp-soft:#f3e7d2;
+  --mono-bg:#11161a;
+  --mono-fg:#8fe3c0;
+  --mono-line:#28323a;
+  --danger:#8c3a2c;
+  --shadow:0 1px 0 rgba(28,36,32,.06), 0 6px 16px rgba(28,36,32,.06);
+  --radius:6px;
+  --sidebar-w:300px;
+  --content-max:780px;
+}
+html[data-theme="dark"]{
+  --ink:#e8ecdf;
+  --ink-soft:#aab4a4;
+  --paper:#10151a;
+  --paper-raised:#1a2126;
+  --line:#2c3530;
+  --signal:#3fc6ad;
+  --signal-soft:#16302b;
+  --stamp:#d6a53c;
+  --stamp-soft:#2e2516;
+  --mono-bg:#070a0c;
+  --mono-fg:#8fe3c0;
+  --mono-line:#1d2520;
+  --danger:#e08a76;
+  --shadow:0 1px 0 rgba(0,0,0,.3), 0 10px 24px rgba(0,0,0,.45);
+}
+
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto;}
+  *{animation-duration:.001ms !important; transition-duration:.001ms !important;}
+}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:'IBM Plex Serif', Georgia, serif;
+  font-size:16.5px;
+  line-height:1.68;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4,.display{
+  font-family:'Space Grotesk', system-ui, sans-serif;
+  letter-spacing:-.01em;
+  color:var(--ink);
+}
+.mono{font-family:'IBM Plex Mono', ui-monospace, monospace;}
+a{color:var(--signal);}
+::selection{background:var(--stamp-soft); color:var(--ink);}
+:focus-visible{outline:2px solid var(--signal); outline-offset:2px; border-radius:3px;}
+
+/* ============================================================
+   TOPBAR
+   ============================================================ */
+.topbar{
+  position:sticky; top:0; z-index:40;
+  display:flex; align-items:center; gap:14px;
+  padding:10px 18px;
+  background:var(--paper);
+  border-bottom:1px solid var(--line);
+}
+.brand{display:flex; align-items:center; gap:12px; min-width:0;}
+.stamp-badge{
+  width:42px; height:42px; flex:0 0 auto; position:relative;
+}
+.brand-text{display:flex; flex-direction:column; line-height:1.15; min-width:0;}
+.brand-text .t1{
+  font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:15px;
+  letter-spacing:.04em; white-space:nowrap;
+}
+.brand-text .t2{
+  font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-soft);
+  letter-spacing:.06em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.hamburger{
+  display:none; width:38px; height:38px; border-radius:var(--radius);
+  border:1px solid var(--line); background:var(--paper-raised); cursor:pointer;
+  flex:0 0 auto; align-items:center; justify-content:center;
+}
+.hamburger span, .hamburger::before, .hamburger::after{display:none;}
+.hamburger svg{width:18px;height:18px;}
+
+.search-wrap{position:relative; flex:1; max-width:380px; margin-left:auto;}
+.search-input{
+  width:100%; padding:9px 12px 9px 34px; border-radius:var(--radius);
+  border:1px solid var(--line); background:var(--paper-raised); color:var(--ink);
+  font-family:'IBM Plex Mono',monospace; font-size:13px;
+}
+.search-input::placeholder{color:var(--ink-soft);}
+.search-icon{
+  position:absolute; left:11px; top:50%; transform:translateY(-50%);
+  width:14px; height:14px; color:var(--ink-soft); pointer-events:none;
+}
+.search-results{
+  position:absolute; top:calc(100% + 6px); left:0; right:0;
+  background:var(--paper-raised); border:1px solid var(--line); border-radius:var(--radius);
+  box-shadow:var(--shadow); max-height:360px; overflow:auto; z-index:50; display:none;
+}
+.search-results.open{display:block;}
+.search-results .empty{padding:14px; font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:var(--ink-soft);}
+.sr-item{display:block; width:100%; text-align:left; padding:10px 12px; border:0; background:none; cursor:pointer; border-bottom:1px solid var(--line);}
+.sr-item:last-child{border-bottom:0;}
+.sr-item:hover, .sr-item:focus-visible{background:var(--signal-soft);}
+.sr-tag{font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--signal); letter-spacing:.05em; display:block; margin-bottom:3px;}
+.sr-snippet{font-size:13px; color:var(--ink-soft); display:block;}
+.sr-snippet mark{background:var(--stamp-soft); color:var(--ink);}
+
+.progress-pill{
+  display:flex; align-items:center; gap:8px; padding:6px 10px;
+  border:1px solid var(--line); border-radius:999px; background:var(--paper-raised);
+  font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ink-soft);
+  white-space:nowrap; flex:0 0 auto;
+}
+.progress-track{width:54px; height:5px; border-radius:99px; background:var(--line); overflow:hidden;}
+.progress-fill{height:100%; background:var(--signal); width:0%; transition:width .3s ease;}
+.icon-btn{
+  width:38px; height:38px; border-radius:var(--radius); border:1px solid var(--line);
+  background:var(--paper-raised); color:var(--ink); cursor:pointer; flex:0 0 auto;
+  display:flex; align-items:center; justify-content:center;
+}
+.icon-btn svg{width:17px;height:17px;}
+.icon-btn:hover{border-color:var(--signal); color:var(--signal);}
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.layout{display:flex; min-height:calc(100vh - 61px);}
+.sidebar{
+  width:var(--sidebar-w); flex:0 0 auto; border-right:1px solid var(--line);
+  background:var(--paper); position:sticky; top:61px; height:calc(100vh - 61px);
+  overflow-y:auto; padding:18px 0 90px;
+}
+.sidebar-label{
+  font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.12em;
+  color:var(--ink-soft); padding:0 18px 10px; text-transform:uppercase;
+}
+.toc{list-style:none; margin:0; padding:0 10px;}
+.toc li{margin-bottom:3px;}
+.toc a{
+  display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--ink);
+  padding:9px 10px 9px 14px; border-radius:0 6px 6px 0; position:relative;
+  border-left:3px solid transparent;
+}
+.toc a::before{
+  content:""; position:absolute; left:-1px; top:6px; bottom:6px; width:1px;
+}
+.toc a:hover{background:var(--signal-soft);}
+.toc a.active{
+  background:var(--signal-soft); border-left-color:var(--signal); font-weight:600;
+}
+.toc .tab-no{
+  font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-soft);
+  flex:0 0 auto; width:20px;
+}
+.toc a.active .tab-no{color:var(--signal);}
+.toc .tab-title{font-size:14px; line-height:1.3; flex:1;}
+.toc .tab-dot{
+  flex:0 0 auto; width:16px; height:16px; border-radius:50%; border:1.5px solid var(--line);
+  display:flex; align-items:center; justify-content:center; font-size:10px; color:transparent;
+}
+.toc .tab-dot.done{background:var(--signal); border-color:var(--signal); color:#fff;}
+.sidebar-foot{padding:16px 20px 0; margin-top:10px; border-top:1px solid var(--line);}
+.reset-btn{
+  font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ink-soft);
+  background:none; border:1px solid var(--line); border-radius:var(--radius);
+  padding:7px 10px; cursor:pointer; width:100%;
+}
+.reset-btn:hover{color:var(--danger); border-color:var(--danger);}
+.sidebar-note{font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--ink-soft); margin-top:10px; line-height:1.5; padding:0 2px;}
+
+.content{flex:1; min-width:0; padding:46px 28px 120px;}
+.content-inner{max-width:var(--content-max); margin:0 auto;}
+
+/* ============================================================
+   TOPIC
+   ============================================================ */
+.topic{display:none;}
+.topic.active{display:block; animation:fadein .25s ease;}
+@keyframes fadein{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);}}
+
+.topic-head{margin-bottom:8px;}
+.topic-eyebrow{
+  display:flex; align-items:center; gap:10px; margin-bottom:10px;
+}
+.file-no{
+  font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--signal);
+  border:1px solid var(--signal); border-radius:99px; padding:3px 11px; letter-spacing:.04em;
+}
+.deck-tag{
+  font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-soft); letter-spacing:.08em;
+}
+.topic-title{font-size:30px; font-weight:700; margin:0 0 8px; line-height:1.15;}
+.topic-brief{
+  color:var(--ink-soft); font-family:'IBM Plex Mono',monospace; font-size:13px;
+  line-height:1.6; margin:0 0 26px; padding-bottom:22px; border-bottom:1px solid var(--line);
+}
+
+.topic h3{font-size:20px; margin:38px 0 12px; padding-top:4px;}
+.topic h3 .num{color:var(--signal); margin-right:8px;}
+.topic h3:first-of-type{margin-top:6px;}
+.topic h4{font-size:15.5px; margin:22px 0 8px; color:var(--ink);}
+.topic h5{
+  font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.04em;
+  color:var(--signal); text-transform:uppercase; margin:18px 0 6px;
+}
+.topic p{margin:0 0 14px;}
+.topic ul, .topic ol{margin:0 0 14px; padding-left:22px;}
+.topic li{margin-bottom:6px;}
+.topic strong{color:var(--ink); font-weight:600;}
+
+.lede{font-size:18px; color:var(--ink-soft); font-style:italic; margin-bottom:22px;}
+
+table.data, table.glossary{
+  width:100%; border-collapse:collapse; margin:10px 0 22px; font-size:14.5px;
+  background:var(--paper-raised); box-shadow:var(--shadow); border-radius:var(--radius); overflow:hidden;
+}
+table.data caption, table.glossary caption{
+  text-align:left; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-soft);
+  padding:8px 12px; letter-spacing:.04em;
+}
+table.data th, table.glossary th{
+  background:var(--ink); color:var(--paper); text-align:left; padding:10px 14px;
+  font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:13px;
+}
+table.data td, table.glossary td{
+  padding:10px 14px; border-bottom:1px solid var(--line); vertical-align:top;
+}
+table.data tr:last-child td, table.glossary tr:last-child td{border-bottom:0;}
+table.data tr:nth-child(even) td, table.glossary tr:nth-child(even) td{background:var(--signal-soft);}
+table.data td code, table.glossary td code{font-family:'IBM Plex Mono',monospace; font-size:13px;}
+
+pre{
+  background:var(--mono-bg); color:var(--mono-fg); border:1px solid var(--mono-line);
+  border-radius:4px; padding:16px 18px; overflow-x:auto; margin:6px 0 22px;
+  font-family:'IBM Plex Mono',monospace; font-size:13px; line-height:1.6;
+}
+pre code{background:none; color:inherit; font-family:inherit;}
+code{
+  font-family:'IBM Plex Mono',monospace; font-size:13.5px; background:var(--signal-soft);
+  color:var(--signal); padding:1px 6px; border-radius:3px;
+}
+pre code{padding:0;}
+
+.callout{
+  border-left:3px solid var(--stamp); background:var(--stamp-soft); border-radius:0 var(--radius) var(--radius) 0;
+  padding:12px 16px; margin:6px 0 22px; font-size:15px;
+}
+.callout strong:first-child{color:var(--stamp);}
+.callout.signal{border-left-color:var(--signal); background:var(--signal-soft);}
+.callout.signal strong:first-child{color:var(--signal);}
+
+/* cheat sheet */
+.cheat{margin-top:34px; padding-top:22px; border-top:1px dashed var(--line);}
+.cheat-head{display:flex; align-items:baseline; gap:10px; margin-bottom:14px;}
+.cheat-head h5{margin:0;}
+.cheat-head .stamp-text{
+  font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--ink-soft); letter-spacing:.06em;
+}
+.qa-grid{display:grid; grid-template-columns:1fr; gap:10px;}
+.qa-card{
+  background:var(--paper-raised); border:1px solid var(--line); border-radius:var(--radius);
+  padding:14px 16px; box-shadow:var(--shadow);
+}
+.qa-card .q{
+  font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:14.5px; margin:0 0 6px;
+  display:flex; gap:8px;
+}
+.qa-card .q::before{content:"Q"; color:var(--signal); font-family:'IBM Plex Mono',monospace;}
+.qa-card .a{margin:0; font-size:14.5px; color:var(--ink-soft); padding-left:18px;}
+
+/* exhibit / diagram placeholder */
+.exhibit{
+  margin:30px 0 36px; border:1.5px dashed var(--line); border-radius:8px;
+  padding:18px; background:var(--paper-raised); position:relative;
+}
+.exhibit::before, .exhibit::after,
+.exhibit .corner-br, .exhibit .corner-bl{
+  content:""; position:absolute; width:14px; height:14px; pointer-events:none;
+}
+.exhibit::before{top:6px; left:6px; border-top:2px solid var(--stamp); border-left:2px solid var(--stamp);}
+.exhibit::after{top:6px; right:6px; border-top:2px solid var(--stamp); border-right:2px solid var(--stamp);}
+.exhibit .corner-bl{bottom:6px; left:6px; border-bottom:2px solid var(--stamp); border-left:2px solid var(--stamp);}
+.exhibit .corner-br{bottom:6px; right:6px; border-bottom:2px solid var(--stamp); border-right:2px solid var(--stamp);}
+.exhibit-label{
+  font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.06em; color:var(--stamp);
+  text-transform:uppercase; margin-bottom:10px; display:flex; justify-content:space-between; gap:10px;
+}
+.exhibit-zone{
+  min-height:200px; border-radius:5px; background:var(--paper);
+  display:flex; align-items:center; justify-content:center; cursor:pointer;
+  border:1px solid var(--line); overflow:hidden; position:relative;
+}
+.exhibit-zone.has-image{cursor:default; min-height:auto;}
+.exhibit-zone img{display:block; width:100%; height:auto; max-height:520px; object-fit:contain; background:var(--paper-raised);}
+.exhibit-placeholder{
+  display:flex; flex-direction:column; align-items:center; gap:8px; padding:30px 20px;
+  color:var(--ink-soft); text-align:center;
+}
+.exhibit-placeholder svg{width:30px; height:30px; opacity:.6;}
+.exhibit-placeholder .ph-title{font-family:'Space Grotesk',sans-serif; font-size:14px; color:var(--ink); font-weight:600;}
+.exhibit-placeholder .ph-sub{font-family:'IBM Plex Mono',monospace; font-size:11.5px; max-width:340px;}
+.exhibit-zone.dragover{outline:2px dashed var(--signal); outline-offset:-6px; background:var(--signal-soft);}
+.exhibit-actions{display:flex; gap:8px; margin-top:10px;}
+.exhibit-actions button{
+  font-family:'IBM Plex Mono',monospace; font-size:11.5px; padding:6px 11px; border-radius:var(--radius);
+  border:1px solid var(--line); background:var(--paper-raised); color:var(--ink-soft); cursor:pointer;
+}
+.exhibit-actions button:hover{border-color:var(--signal); color:var(--signal);}
+.exhibit-actions button.danger:hover{border-color:var(--danger); color:var(--danger);}
+
+/* footer nav */
+.topic-footer{
+  display:flex; justify-content:space-between; gap:14px; margin-top:42px; padding-top:22px;
+  border-top:1px solid var(--line);
+}
+.nav-btn{
+  flex:1; max-width:340px; display:flex; flex-direction:column; gap:3px; padding:12px 16px;
+  border:1px solid var(--line); border-radius:var(--radius); background:var(--paper-raised);
+  text-decoration:none; color:var(--ink); cursor:pointer;
+}
+.nav-btn:hover{border-color:var(--signal);}
+.nav-btn.next{text-align:right; align-items:flex-end; margin-left:auto;}
+.nav-btn .nb-label{font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--ink-soft); letter-spacing:.06em;}
+.nav-btn .nb-title{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:14.5px;}
+.nav-btn[disabled]{opacity:.35; pointer-events:none;}
+.mark-reviewed{
+  display:inline-flex; align-items:center; gap:8px; margin:30px 0 0; cursor:pointer;
+  font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:var(--ink-soft); user-select:none;
+}
+.mark-reviewed input{width:16px; height:16px; accent-color:var(--signal);}
+
+/* back to top */
+.back-top{
+  position:fixed; right:22px; bottom:22px; width:44px; height:44px; border-radius:50%;
+  background:var(--signal); color:#fff; border:0; cursor:pointer; box-shadow:var(--shadow);
+  display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none;
+  transition:opacity .2s ease, transform .2s ease; z-index:30;
+}
+.back-top.show{opacity:1; pointer-events:auto;}
+.back-top svg{width:18px; height:18px;}
+
+/* toast */
+.toast-wrap{position:fixed; left:50%; bottom:26px; transform:translateX(-50%); z-index:80; display:flex; flex-direction:column; gap:8px; align-items:center;}
+.toast{
+  background:var(--ink); color:var(--paper); font-family:'IBM Plex Mono',monospace; font-size:12.5px;
+  padding:9px 16px; border-radius:99px; box-shadow:var(--shadow); opacity:0; transform:translateY(8px);
+  transition:opacity .25s ease, transform .25s ease;
+}
+.toast.show{opacity:1; transform:translateY(0);}
+
+/* MCQs */
+.mcq-zone { margin: 30px 0; }
+.mcq-container { background: var(--paper-raised); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); }
+.mcq-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--line); padding-bottom: 10px; }
+.mcq-title { font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 600; color: var(--ink); margin: 0; }
+.mcq-status { font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: bold; padding: 4px 10px; border-radius: 99px; }
+.mcq-status.unattempted { background: var(--signal-soft); color: var(--signal); }
+.mcq-status.passed { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+.mcq-status.failed { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+.mcq-list { display: flex; flex-direction: column; gap: 20px; }
+.mcq-item { padding: 15px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper); }
+.mcq-q { font-weight: 600; margin-bottom: 12px; font-size: 15px; }
+.mcq-opt { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; cursor: pointer; font-size: 14.5px; color: var(--ink-soft); }
+.mcq-opt input { margin-top: 4px; accent-color: var(--signal); }
+.mcq-opt:hover { color: var(--ink); }
+.mcq-submit { margin-top: 20px; width: 100%; padding: 12px; background: var(--ink); color: var(--paper); border: none; border-radius: var(--radius); font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: bold; cursor: pointer; }
+.mcq-submit:hover { background: var(--signal); }
+.mcq-feedback { display: none; margin-top: 10px; font-size: 13px; color: var(--ink-soft); padding: 10px; background: var(--stamp-soft); border-left: 3px solid var(--stamp); border-radius: 0 var(--radius) var(--radius) 0; }
+.mcq-item.graded .mcq-opt.correct { color: #155724; font-weight: 600; }
+.mcq-item.graded .mcq-opt.wrong { color: #721c24; text-decoration: line-through; }
+.mcq-item.graded .mcq-feedback { display: block; }
+
+/* responsive */
+@media (max-width: 900px){
+  :root{--sidebar-w:260px;}
+}
+@media (max-width: 760px){
+  .hamburger{display:flex;}
+  .brand-text .t2{display:none;}
+  .search-wrap{max-width:none; order:5; flex:1 1 100%; margin-left:0;}
+  .topbar{flex-wrap:wrap;}
+  .progress-pill{display:none;}
+  .sidebar{
+    position:fixed; left:0; top:61px; bottom:0; z-index:35; transform:translateX(-100%);
+    transition:transform .22s ease; box-shadow:var(--shadow); width:84%; max-width:320px;
+  }
+  .sidebar.open{transform:translateX(0);}
+  .content{padding:32px 16px 100px;}
+  .topic-title{font-size:24px;}
+  .topic-footer{flex-direction:column;}
+  .nav-btn.next{align-items:flex-start; text-align:left;}
+}
+.scrim{display:none; position:fixed; inset:0; background:rgba(0,0,0,.35); z-index:32;}
+.scrim.show{display:block;}
+
+/* ============================================================
+   FILE ATTACHMENTS
+   ============================================================ */
+.file-attachment {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+  margin-bottom: 24px;
+  padding: 8px 14px;
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  transition: all 0.2s ease;
+}
+.file-attachment:hover {
+  border-color: var(--signal);
+  background: var(--signal-soft);
+  transform: translateY(-1px);
+}
+.file-attachment a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink);
+  text-decoration: none;
+  font-weight: 500;
+}
+.file-attachment a:hover {
+  color: var(--signal);
+}
+.file-attachment svg {
+  width: 16px;
+  height: 16px;
+  color: var(--ink-soft);
+  transition: color 0.2s ease;
+}
+.file-attachment:hover svg {
+  color: var(--signal);
+}
+.file-type-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-family: 'Space Grotesk', sans-serif;
+}
+.file-type-badge.pdf {
+  background: #fdf0ed;
+  color: #c93b2b;
+  border: 1px solid #f9d7d2;
+}
+html[data-theme="dark"] .file-type-badge.pdf {
+  background: #3c1e18;
+  color: #ff8b7e;
+  border-color: #5e2f26;
+}
+.file-type-badge.ppt, .file-type-badge.pptx {
+  background: #fdf5e6;
+  color: #b86200;
+  border: 1px solid #f5dec1;
+}
+html[data-theme="dark"] .file-type-badge.ppt, html[data-theme="dark"] .file-type-badge.pptx {
+  background: #352510;
+  color: #ffb85c;
+  border-color: #543b18;
+}
+</style>
+</head>
+<body>
+
+<div class="scrim" id="scrim"></div>
+
+<header class="topbar">
+  <button class="hamburger" id="hamburger" aria-label="Toggle topic index" aria-expanded="false">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
+  <div class="brand">
+    <svg class="stamp-badge" viewBox="0 0 100 100" fill="none">
+      <circle cx="50" cy="50" r="46" stroke="var(--stamp)" stroke-width="2.5" stroke-dasharray="4 3" transform="rotate(-8 50 50)"/>
+      <circle cx="50" cy="50" r="35" stroke="var(--stamp)" stroke-width="1.5" transform="rotate(-8 50 50)"/>
+      <text x="50" y="46" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="var(--stamp)" transform="rotate(-8 50 50)">FIELD</text>
+      <text x="50" y="58" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="var(--stamp)" transform="rotate(-8 50 50)">NOTES</text>
+    </svg>
+    <div class="brand-text">
+      <span class="t1">INFOSEC DOSSIER</span>
+      <span class="t2">11 case files · study topic-wise</span>
+    </div>
+  </div>
+
+  <div class="search-wrap">
+    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" class="search-input" id="searchInput" placeholder="Search every file (e.g. AH, TGT, MAC)..." autocomplete="off">
+    <div class="search-results" id="searchResults"></div>
+  </div>
+
+  <div class="progress-pill">
+    <span id="progressLabel">0/11 reviewed</span>
+    <span class="progress-track"><span class="progress-fill" id="progressFill"></span></span>
+  </div>
+  <button class="icon-btn" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark mode">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+  </button>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar" aria-label="Topic index">
+    <div class="sidebar-label">Case file index</div>
+    <ol class="toc" id="tocList">
+      <li><a href="#db-security" data-topic="db-security"><span class="tab-no">01</span><span class="tab-title">Database Security</span><span class="tab-dot" data-dot="db-security">✓</span></a></li>
+      <li><a href="#tls" data-topic="tls"><span class="tab-no">02</span><span class="tab-title">Transport Layer Security</span><span class="tab-dot" data-dot="tls">✓</span></a></li>
+      <li><a href="#ipsec" data-topic="ipsec"><span class="tab-no">03</span><span class="tab-title">IP Security (IPSec)</span><span class="tab-dot" data-dot="ipsec">✓</span></a></li>
+      <li><a href="#ids" data-topic="ids"><span class="tab-no">04</span><span class="tab-title">Intrusion Detection (IDS)</span><span class="tab-dot" data-dot="ids">✓</span></a></li>
+      <li><a href="#firewall-vpn" data-topic="firewall-vpn"><span class="tab-no">05</span><span class="tab-title">Firewall &amp; VPN</span><span class="tab-dot" data-dot="firewall-vpn">✓</span></a></li>
+      <li><a href="#auth-vuln" data-topic="auth-vuln"><span class="tab-no">06</span><span class="tab-title">Authentication Vulnerabilities</span><span class="tab-dot" data-dot="auth-vuln">✓</span></a></li>
+      <li><a href="#kerberos" data-topic="kerberos"><span class="tab-no">07</span><span class="tab-title">User Auth &amp; Kerberos</span><span class="tab-dot" data-dot="kerberos">✓</span></a></li>
+      <li><a href="#msg-auth" data-topic="msg-auth"><span class="tab-no">08</span><span class="tab-title">Message Authentication</span><span class="tab-dot" data-dot="msg-auth">✓</span></a></li>
+      <li><a href="#digital-sig" data-topic="digital-sig"><span class="tab-no">09</span><span class="tab-title">Digital Signatures</span><span class="tab-dot" data-dot="digital-sig">✓</span></a></li>
+      <li><a href="#cloud-threats" data-topic="cloud-threats"><span class="tab-no">10</span><span class="tab-title">Cloud &amp; Cyber Threats</span><span class="tab-dot" data-dot="cloud-threats">✓</span></a></li>
+      <li><a href="#key-exchange" data-topic="key-exchange"><span class="tab-no">11</span><span class="tab-title">Key Exchange &amp; MAC vs MDC</span><span class="tab-dot" data-dot="key-exchange">✓</span></a></li>
+    </ol>
+    <div class="sidebar-label" style="margin-top: 24px; border-top: 1px solid var(--line); padding-top: 16px;">Reference Archive</div>
+    <ul class="toc" id="referenceLinks" style="list-style: none;">
+      <li>
+        <a href="pre%20mids/" target="_blank">
+          <span class="tab-no" style="font-size: 14px;">📁</span>
+          <span class="tab-title">Pre-Mids Folder</span>
+        </a>
+      </li>
+      <li>
+        <a href="classwork.pdf" target="_blank">
+          <span class="tab-no" style="font-size: 14px;">📄</span>
+          <span class="tab-title">Class Work PDF</span>
+        </a>
+      </li>
+    </ul>
+    <div class="sidebar-foot">
+      <button class="reset-btn" id="resetProgress">Reset progress &amp; saved diagrams</button>
+      <div class="sidebar-note">Tap a file to open it. Tick a file off once you can recite it cold. Your diagrams and progress are saved to this dossier automatically.</div>
+    </div>
+  </nav>
+
+  <main class="content" id="content">
+    <div class="content-inner">
+
+      <section class="topic" id="db-security" data-title="Database Security">
+        <div class="topic-head">
+  <div class="topic-eyebrow">
+    <span class="file-no">FILE 01</span>
+    <span class="deck-tag">INFOSEC DOSSIER</span>
+  </div>
+  <h2 class="topic-title">Database Security</h2>
+  <div class="topic-brief">Concept Notes</div>
+  <div class="file-attachment">
+    <span class="file-type-badge pdf">PDF</span>
+    <a href="file Database Security.pdf" target="_blank" class="file-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      file Database Security.pdf
+    </a>
+  </div>
+</div>
+<h3><span class="num">1.</span> What is a Database?</h3>
+<p>A database is a structured collection of data with defined relationships between data items, managed by a DBMS (Database Management System).</p>
+<table class="data">
+<tr><th>•</th><th>DBMS provides tools to construct, maintain, and query the database. Multiple users and applications can access it simultaneously through a query language (typically SQL).</th></tr>
+<tr><td>•</td><td>The DBMS sits between the raw data and the user — it enforces structure, access rules, and handles queries.</td></tr>
+</table>
+<h3><span class="num">2.</span> Relational Database — Core Concepts</h3>
+<p>Everything in a relational DB is organized as tables. Relationships between tables are maintained through keys.</p>
+<table class="data">
+<tr><th>Term</th><th>What it actually means</th></tr>
+<tr><td>Relation</td><td>A table</td></tr>
+<tr><td>Tuple</td><td>A single row/record</td></tr>
+<tr><td>Attribute</td><td>A column/field</td></tr>
+<tr><td>Primary Key</td><td>Column(s) that uniquely identify each row — no duplicates, no nulls</td></tr>
+<tr><td>Foreign Key</td><td>A column in one table that references the primary key of another table — this is how tables are linked</td></tr>
+<tr><td>View</td><td>A virtual table generated by a query — doesn't store data itself, just presents a filtered/joined result</td></tr>
+</table>
+<p>Why views matter for security: You can give a user access to a view without giving them access to the underlying tables. They only see what the view exposes.</p>
+<h3><span class="num">3.</span> SQL — Structured Query Language</h3>
+<p>SQL is the standard language to interact with relational databases.</p>
+<p>Core operations:</p>
+<table class="data">
+<tr><th>•</th><th>CREATE TABLE — define schema</th></tr>
+<tr><td>•</td><td>INSERT / DELETE — add or remove rows</td></tr>
+<tr><td>•</td><td>SELECT — retrieve data</td></tr>
+<tr><td>•</td><td>CREATE VIEW — define a virtual table</td></tr>
+<tr><td>•</td><td>GRANT / REVOKE — manage access rights</td></tr>
+</table>
+<p>SQL is both powerful and dangerous — it can define, manipulate, and control everything in a database, which is exactly why SQL injection is so destructive.</p>
+<h3><span class="num">4.</span> Why Database Security Lags Behind</h3>
+<p>This is a common exam/interview question. Four key reasons:</p>
+<h3><span class="num">1.</span> Cloud complexity — databases are increasingly hosted on cloud platforms, adding layers outside the organization's direct control.</h3>
+<h3><span class="num">2.</span> Heterogeneous environments — enterprises mix different DB platforms, OS types, and enterprise tools, making a unified security strategy hard.</h3>
+<h3><span class="num">3.</span> Lack of dedicated personnel — most organizations don't have full-time database security staff.</h3>
+<h3><span class="num">4.</span> SQL complexity — effective DB security requires deep understanding of SQL vulnerabilities, which many admins don't have.</h3>
+<h3><span class="num">5.</span> SQL Injection (SQLi)</h3>
+<p>What it is</p>
+<p>SQLi is an attack where malicious SQL code is injected into an input field, causing the database to execute unintended commands. It's one of the most common and dangerous web-based attacks.</p>
+<p>The attacker abuses the fact that user input is directly embedded into SQL queries without sanitization.</p>
+<p>How it works — the core mechanism</p>
+<p>A normal login query looks like this:</p>
+<p>SELECT * FROM login WHERE user='timbo317' AND pass='cse7330'</p>
+<p>If the application blindly inserts user input, an attacker can type:</p>
+<p>' OR 'a'='a</p>
+<p>Which turns the query into:</p>
+<p>SELECT * FROM login WHERE user='' OR 'a'='a' AND pass='' OR 'a'='a'</p>
+<p>Since 'a'='a' is always true, the WHERE clause always evaluates to true — the attacker logs in without valid credentials.</p>
+<p>The -- at the end of an injection is a SQL comment — everything after it is ignored. This lets attackers terminate the rest of the original query cleanly.</p>
+<p>Attack goals</p>
+<table class="data">
+<tr><th>•</th><th>Bulk data extraction</th></tr>
+<tr><td>•</td><td>Modifying or deleting data</td></tr>
+<tr><td>•</td><td>Dropping entire tables (DROP TABLE login)</td></tr>
+<tr><td>•</td><td>Inserting rogue accounts</td></tr>
+<tr><td>•</td><td>Executing OS-level commands</td></tr>
+<tr><td>•</td><td>Launching DoS attacks</td></tr>
+</table>
+<h3><span class="num">6.</span> SQLi Attack Types</h3>
+<h4>A) Inband Attacks</h4>
+<p>The injected code and the results use the same communication channel. Results are shown directly in the web page.</p>
+<p>Three subtypes:</p>
+<p>Tautology — inject always-true conditions into WHERE clauses to bypass authentication or return all rows.</p>
+<p>WHERE user='' OR 'a'='a'</p>
+<p>End-of-line comment — terminate the original query using -- so legitimate SQL after the injection point is ignored.</p>
+<p>'; DROP TABLE login; --</p>
+<p>Piggybacked queries — add entirely new SQL statements after the original using ; to chain multiple commands.</p>
+<p>SELECT * FROM login WHERE user=''; INSERT INTO login VALUES ('haxor','pass');--</p>
+<h4>B) Inferential (Blind) Attacks</h4>
+<p>No data is directly returned. The attacker infers information by observing the application's behavior (does it error? does it respond differently?).</p>
+<p>Two subtypes:</p>
+<p>Illegal/logically incorrect queries — send malformed SQL and observe error messages. Error messages often leak the database type, table names, or column names. This is an information gathering step before a more targeted attack.</p>
+<p>Blind SQL injection — the application doesn't show errors either, so the attacker asks true/false questions via SQL and observes subtle differences in responses (page loads slower, page content changes slightly). Slow but effective.</p>
+<h4>C) Out-of-Band Attacks</h4>
+<p>Data is exfiltrated through a different channel — e.g., making the database server send data to an external DNS or HTTP server. Used when inband extraction is restricted but the DB server has outbound network access.</p>
+<h3><span class="num">7.</span> SQLi Attack Avenues (How attackers deliver the payload)</h3>
+<table class="data">
+<tr><th>Avenue</th><th>How it works</th></tr>
+<tr><td>User input</td><td>Classic form fields — username, password, search boxes</td></tr>
+<tr><td>Server variables</td><td>HTTP headers (User-Agent, Referer, X-Forwarded-For) are forged and contain injected SQL</td></tr>
+<tr><td>Cookies</td><td>Application reads cookies to build queries — attacker modifies cookie values</td></tr>
+<tr><td>Second-order injection</td><td>Malicious data is stored first (appears safe on input), then retrieved later and used unsanitized in a query — the attack triggers at retrieval time, not input time</td></tr>
+<tr><td>Physical user input</td><td>QR codes, barcodes, or physical forms that get scanned and fed into DB queries</td></tr>
+</table>
+<p>Second-order injection is tricky because the data passes input validation on entry but is never re-validated when used.</p>
+<h3><span class="num">8.</span> SQLi Countermeasures</h3>
+<p>Three categories:</p>
+<p>Defensive Coding</p>
+<table class="data">
+<tr><th>•</th><th>Input validation — allow only expected characters (alphanumeric) in inputs, reject or escape everything else.</th></tr>
+<tr><td>•</td><td>Escape special characters — convert ' to \' so it can't terminate a string. Must be done server-side, never client-side (client-side validation is trivially bypassed).</td></tr>
+<tr><td>•</td><td>Principle of least privilege — the DB user account the app uses should have only the minimum rights needed (e.g., read-only if it only needs to read).</td></tr>
+</table>
+<p>Parameterized Queries (Prepared Statements)</p>
+<p>The most effective defense. Instead of building the query string by concatenating user input:</p>
+<p># Vulnerable</p>
+<p>query = "SELECT * FROM users WHERE user='" + username + "'"</p>
+<p># Safe — parameterized</p>
+<p>query = "SELECT * FROM users WHERE user = ?"</p>
+<p>cursor.execute(query, (username,))</p>
+<p>The DB engine treats the parameter as data, never as SQL code — even if it contains quotes or SQL keywords.</p>
+<p>SQL DOM</p>
+<p>A layer that provides structured access to the database, preventing raw string concatenation from ever forming the query.</p>
+<p>Detection Approaches</p>
+<table class="data">
+<tr><th>•</th><th>Signature-based — match known attack patterns.</th></tr>
+<tr><td>•</td><td>Anomaly-based — detect queries that deviate from the expected query profile.</td></tr>
+<tr><td>•</td><td>Code analysis — static analysis of application code to find injection points.</td></tr>
+<tr><td>•</td><td>Runtime prevention — validate queries at execution time against a model of expected queries.</td></tr>
+</table>
+<h3><span class="num">9.</span> Database Access Control</h3>
+<p>What it controls</p>
+<table class="data">
+<tr><th>•</th><th>Whether a user can access the entire DB or only specific tables/views.</th></tr>
+<tr><td>•</td><td>What operations that user can perform: SELECT, INSERT, UPDATE, DELETE, CREATE, REFERENCES.</td></tr>
+</table>
+<p>Administrative Models</p>
+<p>Centralized — a small group of privileged admins grant and revoke all access rights. Simple but creates a bottleneck.</p>
+<p>Ownership-based — the creator of a table automatically owns it and manages who gets access to it.</p>
+<p>Decentralized — table owners can delegate their ability to grant access to other users. Those users can then grant to others. Flexible but harder to audit — privilege can propagate widely.</p>
+<p>SQL Access Control — GRANT and REVOKE</p>
+<p>-- Give Bob read access to the Employee table</p>
+<p>GRANT SELECT ON Employee TO Bob;</p>
+<p>-- Give Alice insert and update rights</p>
+<p>GRANT INSERT, UPDATE ON Employee TO Alice;</p>
+<p>-- Remove Bob's access</p>
+<p>REVOKE SELECT ON Employee FROM Bob;</p>
+<p>When a privilege is revoked, it cascades — if Bob had granted that privilege to David, David's access is also revoked (this is what the timestamp diagram in the slides illustrates).</p>
+<h3><span class="num">10.</span> Database Encryption</h3>
+<p>Encryption is the last line of defense — it protects data even if all other layers (firewall, auth, access control) are bypassed, such as in physical theft of storage media or a backup leak.</p>
+<p>Levels of encryption</p>
+<table class="data">
+<tr><th>•</th><th>Entire database</th></tr>
+<tr><td>•</td><td>Record (row) level</td></tr>
+<tr><td>•</td><td>Attribute (column) level — e.g., only encrypt the Salary column</td></tr>
+<tr><td>•</td><td>Individual field level</td></tr>
+</table>
+<p>How it works (the scheme from slides)</p>
+<h3><span class="num">1.</span> User sends a query to the Query Processor.</h3>
+<h3><span class="num">2.</span> Query is transformed (to work on encrypted data).</h3>
+<h3><span class="num">3.</span> Transformed query runs against the encrypted database on the server.</h3>
+<h3><span class="num">4.</span> Encrypted result is returned to the client.</h3>
+<h3><span class="num">5.</span> Client decrypts the result and presents plaintext to the user.</h3>
+<p>The server never sees the plaintext data — only encrypted values.</p>
+<p>Disadvantages</p>
+<p>Key management — every authorized user needs the decryption key for the data they're allowed to see. Managing these keys across users and roles is complex.</p>
+<p>Inflexibility / performance — encrypted data is harder to search and index. You can't do a simple WHERE salary > 50000 on encrypted salary values without special techniques. This slows down query operations significantly.</p>
+<div class="cheat">
+<div class="cheat-head"><h5>Quick Reference Cheat Sheet</h5><span class="stamp-text">EXAM PREP</span></div>
+<div class="qa-grid">
+<div class="qa-card"><div class="q">What is SQL injection?</div><div class="a">Inserting malicious SQL into an input field to manipulate the query the application sends to the database.</div></div>
+<div class="qa-card"><div class="q">What's the difference between inband and inferential SQLi?</div><div class="a">Inband: results come back directly through the same channel (you see the data in the page). Inferential (blind): no data returned, you infer from the app's behavior.</div></div>
+<div class="qa-card"><div class="q">Best defense against SQLi?</div><div class="a">Parameterized queries / prepared statements. Input validation is necessary but not sufficient alone.</div></div>
+<div class="qa-card"><div class="q">Why validate server-side and not client-side?</div><div class="a">Client-side JavaScript can be disabled or bypassed by the attacker entirely. Server-side validation always runs.</div></div>
+<div class="qa-card"><div class="q">What is second-order injection?</div><div class="a">The attacker stores malicious data that passes initial validation, but the stored data is later used unsanitized in a query — the attack triggers at retrieval/use time.</div></div>
+<div class="qa-card"><div class="q">What is a view and why is it used for security?</div><div class="a">A virtual table derived from a query. Used to expose only specific rows/columns to a user without giving them access to the base tables.</div></div>
+<div class="qa-card"><div class="q">What happens when REVOKE cascades?</div><div class="a">If A granted privilege to B, and B granted to C — revoking A's privilege cascades down and removes B's and C's as well.</div></div>
+<div class="qa-card"><div class="q">Why is database encryption considered the last line of defense?</div><div class="a">Because it protects the data even if the attacker bypasses the network, authentication, and access control layers — the raw data is still unreadable without the key.</div></div>
+</div></div>
+
+<div class="mcq-zone"></div>
+<div class="exhibit">
+  <div class="corner-bl"></div><div class="corner-br"></div>
+  <div class="exhibit-label">
+    <span>DIAGRAM SPACE</span>
+  </div>
+  <div class="exhibit-zone has-image" data-topic="db-security">
+    <img src="temp.img" alt="Diagram">
+  </div>
+  <div class="exhibit-actions" style="display:flex;">
+    <button class="exhibit-replace">Replace</button>
+    <button class="exhibit-remove danger">Remove</button>
+  </div>
+  <input type="file" class="exhibit-file" accept="image/*" style="display:none;">
+</div>
+<div class="topic-footer">
+  <button class="nav-btn prev" data-nav="prev"><span class="nb-label">PREV CASE</span><span class="nb-title">--</span></button>
+  <button class="nav-btn next" data-nav="next"><span class="nb-label">NEXT CASE</span><span class="nb-title">--</span></button>
+</div>
+<label class="mark-reviewed">
+  <input type="checkbox" class="reviewed-checkbox" data-topic="db-security">
+  I have mastered this case file
+</label>
+        
+      </section>
+
+      <section class="topic" id="tls" data-title="Transport Layer Security (TLS)">
+        <div class="topic-head">
+  <div class="topic-eyebrow">
+    <span class="file-no">FILE 02</span>
+    <span class="deck-tag">INFOSEC DOSSIER</span>
+  </div>
+  <h2 class="topic-title">Transport Layer Security (TLS)</h2>
+  <div class="topic-brief">Concept Notes</div>
+  <div class="file-attachment">
+    <span class="file-type-badge ppt">PPT</span>
+    <a href="file TLS-SSL.ppt" target="_blank" class="file-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      file TLS-SSL.ppt
+    </a>
+  </div>
+</div>
+<h3><span class="num">1.</span> Background — What Problem Does TLS Solve?</h3>
+<p>When you send data over the internet (HTTP, email, etc.), it travels through multiple routers and servers. Anyone sitting in between can read or tamper with it — this is a man-in-the-middle scenario.</p>
+<p>TLS was designed to solve three problems simultaneously:</p>
+<table class="data">
+<tr><th>•</th><th>Confidentiality — no one can read the data in transit</th></tr>
+<tr><td>•</td><td>Integrity — no one can tamper with the data undetected</td></tr>
+<tr><td>•</td><td>Authentication — you know you're talking to the real server (or client), not an imposter</td></tr>
+</table>
+<h3><span class="num">2.</span> TLS vs SSL — What's the Difference?</h3>
+<p>SSL (Secure Socket Layer) was the original protocol developed by Netscape in the 90s.</p>
+<p>TLS (Transport Layer Security) is the IETF-standardized successor to SSL — it's essentially SSL that was cleaned up, made more secure, and formally standardized. In practice people still say "SSL" colloquially but what's actually running on the internet today is TLS.</p>
+<h3><span class="num">3.</span> Where Does TLS Sit? — OSI Model Context</h3>
+<p>The OSI model has 7 layers:</p>
+<table class="data">
+<tr><th>Layer</th><th>Name</th><th>PDU (Data Unit)</th></tr>
+<tr><td>7</td><td>Application</td><td>Data</td></tr>
+<tr><td>6</td><td>Presentation</td><td>Data</td></tr>
+<tr><td>5</td><td>Session</td><td>Data</td></tr>
+<tr><td>4</td><td>Transport</td><td>Segments</td></tr>
+<tr><td>3</td><td>Network</td><td>Packets</td></tr>
+<tr><td>2</td><td>Data Link</td><td>Frames</td></tr>
+<tr><td>1</td><td>Physical</td><td>Bits</td></tr>
+</table>
+<p>TLS operates at the Presentation layer (Layer 6) — sitting between the Application layer and the Transport layer. It intercepts data coming from the application, encrypts it, and hands it to TCP for transport.</p>
+<p>This is why TLS works transparently with almost any application protocol — HTTP becomes HTTPS, IMAP becomes IMAPS, LDAP becomes LDAPS. The application doesn't need to know how encryption works; TLS handles it below.</p>
+<p>TCP/IP governs routing and delivery. TLS runs on top of TCP and secures what TCP carries.</p>
+<h3><span class="num">4.</span> TCP Handshake — Quick Primer</h3>
+<p>Before TLS even begins, TCP must establish a connection. TCP uses a 4-step handshake:</p>
+<p>Client                    Server</p>
+<p>|--- SYN ---------------->|   "I want to connect"</p>
+<p>|<-- ACK -----------------|   "Got it"</p>
+<p>|--- Hello --------------->|   "Let's talk" (connection established)</p>
+<p>|<-- ACK -----------------|   "Confirmed"</p>
+<table class="data">
+<tr><th>•</th><th>SYN (Synchronize) — the client sends a ping/request to initiate connection</th></tr>
+<tr><td>•</td><td>ACK (Acknowledge) — confirmation that the packet was received</td></tr>
+<tr><td>•</td><td>Hello — signals that the connection is live and communication can begin</td></tr>
+</table>
+<p>This is pure TCP — no security yet. TLS handshake happens after this TCP connection is up.</p>
+<h3><span class="num">5.</span> Three Services TLS Provides</h3>
+<p>Server Authentication</p>
+<p>The server proves its identity to the client using a digital certificate issued by a Certificate Authority (CA).</p>
+<p>The client has a built-in list of trusted CAs (your browser ships with hundreds of these). When the server presents its certificate, the client checks:</p>
+<table class="data">
+<tr><th>•</th><th>Is this certificate signed by a CA I trust?</th></tr>
+<tr><td>•</td><td>Is the certificate valid (not expired, not revoked)?</td></tr>
+<tr><td>•</td><td>Does the domain on the certificate match the server I'm connecting to?</td></tr>
+</table>
+<p>If all checks pass, the client knows it's talking to the real server — not an imposter. This is critical when you're entering a credit card number or logging into your bank.</p>
+<p>Client Authentication</p>
+<p>Less common but supported. The server can also verify the client's identity using a client certificate — the same process in reverse. Used in enterprise environments, VPNs, or banking apps where the server needs to confirm who is connecting.</p>
+<p>Encrypted Connection</p>
+<p>Once authentication is done, all data exchanged between client and server is encrypted. The sending side encrypts, the receiving side decrypts. Anyone intercepting the packets sees only ciphertext — unreadable without the key.</p>
+<h3><span class="num">6.</span> TLS Sub-Protocols</h3>
+<p>TLS is internally split into two sub-protocols that do separate jobs.</p>
+<h4>A) TLS Record Protocol</h4>
+<p>This is the data transmission layer of TLS — it defines the format/structure of how encrypted data is sent.</p>
+<p>It provides two services for every piece of data sent:</p>
+<p>Confidentiality — data is encrypted using a shared symmetric key that was established during the handshake. Symmetric encryption (like AES) is used here because it's fast enough for bulk data.</p>
+<p>Message Integrity — a MAC (Message Authentication Code) is computed and attached to each record using another shared key. The receiver recomputes the MAC and checks it matches — if anyone tampered with the data in transit, the MAC won't match and the data is rejected.</p>
+<p>Think of MAC like a tamper-evident seal on a package. It doesn't hide the contents (that's encryption's job) but it detects if anyone messed with the package.</p>
+<h4>B) TLS Handshake Protocol</h4>
+<p>This is the most complex part of TLS and the one examiners focus on.</p>
+<p>The handshake happens before any actual application data is sent. Its job is to:</p>
+<h3><span class="num">1.</span> Authenticate the server (and optionally the client)</h3>
+<h3><span class="num">2.</span> Agree on which encryption algorithm to use (cipher suite negotiation)</h3>
+<h3><span class="num">3.</span> Agree on which MAC algorithm to use</h3>
+<h3><span class="num">4.</span> Securely establish the shared secret keys that the Record Protocol will use</h3>
+<p>How the shared key is established securely over an insecure channel is the clever part — TLS uses public-key cryptography (asymmetric) during the handshake to securely exchange a secret, and then switches to symmetric encryption for the actual data because symmetric is much faster.</p>
+<p>Simplified handshake flow:</p>
+<p>Client                              Server</p>
+<p>|--- ClientHello (algorithms) ------>|</p>
+<p>|<-- ServerHello + Certificate ------|</p>
+<p>|    (client verifies certificate)   |</p>
+<p>|--- Key Exchange ----------------->|</p>
+<p>|    (both derive shared secret)     |</p>
+<p>|--- Finished ---------------------->|</p>
+<p>|<-- Finished -----------------------|</p>
+<p>|                                    |</p>
+<p>|======= Encrypted Data ============|</p>
+<h3><span class="num">7.</span> How TLS Fits Into the TCP/IP Stack</h3>
+<p>Protocols like HTTP, LDAP, and IMAP run on top of TCP/IP. TLS slots in between:</p>
+<p>Application Layer:   HTTP / LDAP / IMAP / SMTP</p>
+<p>↓</p>
+<p>TLS (encrypts before handing to TCP)</p>
+<p>↓</p>
+<p>Transport Layer:          TCP</p>
+<p>↓</p>
+<p>Network Layer:            IP</p>
+<p>TLS is transparent to the application — HTTP doesn't need to know about encryption. It just hands data to TLS, and TLS delivers it encrypted.</p>
+<h3><span class="num">8.</span> LAN Note</h3>
+<p>LAN (Local Area Network) — the smallest network unit in the network hierarchy. Not the smallest device but the smallest network grouping. Data link layer (Layer 2) handles communication within a LAN using MAC addresses and frames.</p>
+<div class="cheat">
+<div class="cheat-head"><h5>Quick Reference Cheat Sheet</h5><span class="stamp-text">EXAM PREP</span></div>
+<div class="qa-grid">
+<div class="qa-card"><div class="q">What is TLS and why do we need it?</div><div class="a">TLS is a security protocol that provides confidentiality, integrity, and authentication for data in transit. Without it, anyone can read or modify your network traffic.</div></div>
+<div class="qa-card"><div class="q">Difference between SSL and TLS?</div><div class="a">SSL is the older Netscape protocol. TLS is the IETF-standardized evolution of SSL. TLS is what's actually used today — SSL is deprecated and insecure.</div></div>
+<div class="qa-card"><div class="q">At which OSI layer does TLS operate?</div><div class="a">Presentation layer (Layer 6), between the application and transport layers.</div></div>
+<div class="qa-card"><div class="q">What are the two sub-protocols of TLS?</div><div class="a">Record Protocol (handles data formatting, encryption, and integrity) and Handshake Protocol (handles authentication and key exchange before data flows).</div></div>
+<div class="qa-card"><div class="q">What is the TLS Handshake Protocol responsible for?</div><div class="a">Mutual authentication, cipher suite negotiation, and establishing the shared secret keys used for encryption and MAC.</div></div>
+<div class="qa-card"><div class="q">Why does TLS switch from asymmetric to symmetric encryption after the handshake?</div><div class="a">Asymmetric cryptography (public/private key) is too slow for bulk data transfer. The handshake uses asymmetric crypto to safely exchange a symmetric key, then all actual data uses that faster symmetric key.</div></div>
+<div class="qa-card"><div class="q">What is a MAC in TLS?</div><div class="a">Message Authentication Code — a hash computed using a shared secret key, appended to each record. It lets the receiver verify the data wasn't tampered with in transit.</div></div>
+<div class="qa-card"><div class="q">What is a Certificate Authority (CA)?</div><div class="a">A trusted third party that issues digital certificates. Your browser trusts a pre-installed list of CAs. When a server presents a certificate signed by one of these CAs, the browser accepts it as proof of the server's identity.</div></div>
+<div class="qa-card"><div class="q">What is the difference between server auth and client auth in TLS?</div><div class="a">Server auth — client verifies the server's identity (always done). Client auth — server verifies the client's identity (optional, used in enterprise/banking scenarios).</div></div>
+</div></div>
+
+<div class="mcq-zone"></div>
+<div class="exhibit">
+  <div class="corner-bl"></div><div class="corner-br"></div>
+  <div class="exhibit-label">
+    <span>DIAGRAM SPACE</span>
+  </div>
+  <div class="exhibit-zone has-image" data-topic="tls">
+    <img src="tls1.jpg" alt="Diagram" style="margin-bottom: 10px;">
+    <img src="tls2.png" alt="Diagram" style="margin-bottom: 10px;">
+    <img src="tls3.png" alt="Diagram">
+  </div>
+  <div class="exhibit-actions" style="display:flex;">
+    <button class="exhibit-replace">Replace</button>
+    <button class="exhibit-remove danger">Remove</button>
+  </div>
+  <input type="file" class="exhibit-file" accept="image/*" style="display:none;">
+</div>
+<div class="topic-footer">
+  <button class="nav-btn prev" data-nav="prev"><span class="nb-label">PREV CASE</span><span class="nb-title">--</span></button>
+  <button class="nav-btn next" data-nav="next"><span class="nb-label">NEXT CASE</span><span class="nb-title">--</span></button>
+</div>
+<label class="mark-reviewed">
+  <input type="checkbox" class="reviewed-checkbox" data-topic="tls">
+  I have mastered this case file
+</label>
+        
+      </section>
+
+      <section class="topic" id="ipsec" data-title="IP Security (IPSec)">
+        <div class="topic-head">
+  <div class="topic-eyebrow">
+    <span class="file-no">FILE 03</span>
+    <span class="deck-tag">INFOSEC DOSSIER</span>
+  </div>
+  <h2 class="topic-title">IP Security (IPSec)</h2>
+  <div class="topic-brief">Concept Notes</div>
+  <div class="file-attachment">
+    <span class="file-type-badge pptx">PPTX</span>
+    <a href="file Security.pptx" target="_blank" class="file-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      file Security.pptx
+    </a>
+  </div>
+</div>
+<h3><span class="num">1.</span> Why Did IPSec Need to Exist?</h3>
+<p>The original Internet was designed for connectivity, not security. The assumption was that the network was trusted and the people using it were trusted (early ARPANET was academic/military researchers).</p>
+<p>Security was left entirely up to individual applications — if you wanted secure communication, your app had to figure it out itself. This worked fine when the internet was small and controlled, but as it scaled to the public, this became a serious gap.</p>
+<p>Eventually it became clear that security needed to exist at the IP layer itself — not patched onto every application separately. If security lives at IP, every application automatically benefits without needing to implement it themselves. That's the core idea behind IPSec.</p>
+<h3><span class="num">2.</span> What is IPSec?</h3>
+<p>IPSec (Internet Protocol Security) is a suite of protocols that operates at the Network Layer (Layer 3) to secure IP communication by authenticating and encrypting every IP packet.</p>
+<p>Key points:</p>
+<table class="data">
+<tr><th>•</th><th>Works for both IPv4 and IPv6 (in IPv6 it's mandatory, in IPv4 it's optional)</th></tr>
+<tr><td>•</td><td>Available in Windows, Linux, Cisco routers — it's a widely implemented standard</td></tr>
+<tr><td>•</td><td>Most commonly associated with VPNs</td></tr>
+<tr><td>•</td><td>Because it's at the IP layer, it's transparent to applications — apps don't know or care that IPSec is running underneath</td></tr>
+</table>
+<h3><span class="num">3.</span> Services → Mechanisms → Algorithms</h3>
+<p>This is a layered way to think about any security protocol:</p>
+<table class="data">
+<tr><th>•</th><th>Services — what security goals it achieves (e.g., confidentiality, authentication, integrity)</th></tr>
+<tr><td>•</td><td>Mechanisms — the tools used to achieve those services (e.g., encryption, digital signatures, MACs)</td></tr>
+<tr><td>•</td><td>Algorithms — the actual math/implementation of those mechanisms (e.g., AES for encryption, SHA for hashing)</td></tr>
+</table>
+<p>IPSec follows this model. It lets you choose which services you need, which mechanisms to apply, and which algorithms to use — giving flexibility across different deployment scenarios.</p>
+<h3><span class="num">4.</span> Applications of IPSec — Where Is It Actually Used?</h3>
+<table class="data">
+<tr><th>Use Case</th><th>What's Happening</th></tr>
+<tr><td>Secure Branch Office Connectivity</td><td>Two office networks connected over the public internet as if they're on the same private network</td></tr>
+<tr><td>Secure Remote Access</td><td>An employee working from home connects securely to the company network (VPN)</td></tr>
+<tr><td>Extranet/Intranet with Partners</td><td>Two companies share a private secured channel for business data exchange</td></tr>
+<tr><td>E-Commerce Security</td><td>Securing transactions at the network level, below the application</td></tr>
+</table>
+<h3><span class="num">5.</span> Benefits of IPSec</h3>
+<p>Perimeter security — when implemented in a firewall or router, IPSec secures all traffic crossing that boundary. You don't need to secure each application individually.</p>
+<p>Transparent to applications — IPSec sits below the transport layer (below TCP/UDP), so HTTP, email, FTP, databases — all of them get secured without any code changes.</p>
+<p>Transparent to end users — users don't need to do anything special. The security happens in the network infrastructure automatically.</p>
+<p>Per-user security — if needed, IPSec can also be configured to secure traffic for specific individual users rather than entire networks.</p>
+<h3><span class="num">6.</span> The Two Core Protocols — AH and ESP</h3>
+<p>IPSec gives you two protocol options. You choose based on what you need.</p>
+<p>AH — Authentication Header</p>
+<p>AH provides:</p>
+<table class="data">
+<tr><th>•</th><th>Data Integrity — ensures the packet hasn't been modified in transit</th></tr>
+<tr><td>•</td><td>Authentication — proves the packet actually came from the claimed source</td></tr>
+</table>
+<p>AH does not provide confidentiality — the data is not encrypted, just authenticated and integrity-checked. Anyone can still read the contents, they just can't modify them undetected.</p>
+<p>Use AH when you need to verify who sent the data and that it's intact, but don't need to hide it.</p>
+<p>ESP — Encapsulating Security Payload</p>
+<p>ESP provides:</p>
+<table class="data">
+<tr><th>•</th><th>Confidentiality — data is encrypted, no one can read it in transit</th></tr>
+<tr><td>•</td><td>Limited traffic flow confidentiality — hides some information about traffic patterns</td></tr>
+<tr><td>•</td><td>Authentication and Integrity — optionally, ESP can also do everything AH does</td></tr>
+</table>
+<p>ESP is the more commonly used protocol because it covers confidentiality and can optionally cover authentication/integrity — making AH redundant in most scenarios.</p>
+<p>If you need encryption, use ESP. If you only need authentication/integrity, use AH. ESP can replace AH entirely if configured with authentication.</p>
+<h3><span class="num">7.</span> Transport Mode vs Tunnel Mode</h3>
+<p>This is a critical distinction — understand what each mode protects.</p>
+<p>Transport Mode</p>
+<p>Protects only the payload of the IP packet (the upper layer data — TCP/UDP segment and its contents). The original IP header is left as-is.</p>
+<p>Original Packet:  [IP Header] [TCP Header] [Data]</p>
+<p>After Transport:  [IP Header] [AH/ESP]    [TCP Header] [Data]</p>
+<p>↑ unchanged  ↑ inserted here</p>
+<table class="data">
+<tr><th>•</th><th>Used for end-to-end communication between two hosts</th></tr>
+<tr><td>•</td><td>Both endpoints must support IPSec</td></tr>
+<tr><td>•</td><td>The IP source and destination are visible — only the payload is protected</td></tr>
+</table>
+<p>Tunnel Mode</p>
+<p>Wraps the entire original IP packet (header + payload) inside a new IP packet with a new IP header. The original packet is completely hidden.</p>
+<p>Original Packet:  [IP Header] [TCP Header] [Data]</p>
+<p>After Tunnel:     [New IP Header] [AH/ESP] [IP Header] [TCP Header] [Data]</p>
+<p>↑ new destination         ↑ original packet hidden inside</p>
+<table class="data">
+<tr><th>•</th><th>Used for router-to-router VPNs — the routers at each end handle the encapsulation/decapsulation</th></tr>
+<tr><td>•</td><td>The actual source and destination of the original traffic are hidden inside</td></tr>
+<tr><td>•</td><td>The endpoints of the tunnel (routers/gateways) don't need to be the final source/destination</td></tr>
+</table>
+<p>Tunnel Mode Configurations</p>
+<p>Since tunnel mode wraps one packet inside another with a different destination, the tunnel endpoints can be:</p>
+<table class="data">
+<tr><th>•</th><th>Router to Router — most common in site-to-site VPNs</th></tr>
+<tr><td>•</td><td>Router to Host — gateway connects to a specific remote machine</td></tr>
+<tr><td>•</td><td>Host to Router — remote user connects through a gateway</td></tr>
+<tr><td>•</td><td>Host to Host — two individual machines form the tunnel</td></tr>
+</table>
+<p>Simple Analogy</p>
+<p>Think of transport mode like putting a letter in a tamper-evident envelope — the address on the outside is real, only the letter inside is protected.</p>
+<p>Tunnel mode is like putting that sealed envelope inside another envelope with a different address — the inner envelope (original packet) is completely hidden.</p>
+<h3><span class="num">8.</span> IPSec and IP Versions</h3>
+<table class="data">
+<tr><th>Version</th><th>IPSec Status</th></tr>
+<tr><td>IPv4</td><td>Optional — implemented as extensions/options</td></tr>
+<tr><td>IPv6</td><td>Mandatory — built into the specification</td></tr>
+</table>
+<p>IPv6 was designed with security in mind from the start, so IPSec is a required part of any IPv6 implementation. IPv4 got IPSec retrofitted as an optional add-on.</p>
+<div class="cheat">
+<div class="cheat-head"><h5>Quick Reference Cheat Sheet</h5><span class="stamp-text">EXAM PREP</span></div>
+<div class="qa-grid">
+<div class="qa-card"><div class="q">What is IPSec and at which layer does it operate?</div><div class="a">IPSec is a suite of protocols that provides authentication and encryption at the Network Layer (Layer 3). It secures every IP packet, making security transparent to all applications above it.</div></div>
+<div class="qa-card"><div class="q">Why was IPSec created?</div><div class="a">The original internet had no security at the IP level — security was left to individual applications. IPSec moved security to the IP layer so every application gets it universally without each one implementing it separately.</div></div>
+<div class="qa-card"><div class="q">What is the difference between AH and ESP?</div><div class="a">AH provides authentication and integrity only — no encryption. ESP provides encryption (confidentiality) and optionally authentication/integrity. ESP is more commonly used because it can do everything AH does plus encryption.</div></div>
+<div class="qa-card"><div class="q">What is the difference between Transport mode and Tunnel mode?</div><div class="a">Transport mode protects only the payload of an IP packet, leaving the original IP header exposed — used for host-to-host communication. Tunnel mode wraps the entire original packet (header + payload) inside a new IP packet — used for router-to-router VPNs where you want to hide the original source/destination.</div></div>
+<div class="qa-card"><div class="q">Which mode is used for VPNs?</div><div class="a">Tunnel mode. The entire original packet is encapsulated and sent to the VPN gateway, which unwraps it and forwards it to the actual destination. The original traffic is completely hidden in transit.</div></div>
+<div class="qa-card"><div class="q">Is IPSec mandatory in IPv6?</div><div class="a">Yes. IPSec is a required part of IPv6. In IPv4 it's optional.</div></div>
+<div class="qa-card"><div class="q">Why is IPSec said to be transparent to applications?</div><div class="a">Because it operates below the transport layer (Layer 3, not Layer 4+). Applications like HTTP, FTP, email run on top of TCP/UDP and never interact with IPSec directly — it secures their traffic invisibly.</div></div>
+<div class="qa-card"><div class="q">What's the relationship between Services, Mechanisms, and Algorithms in IPSec?</div><div class="a">Services are the security goals (confidentiality, integrity, authentication). Mechanisms are how those goals are achieved (encryption, MACs, digital signatures). Algorithms are the specific implementations (AES, SHA, RSA). IPSec lets you configure all three.</div></div>
+</div></div>
+
+<div class="mcq-zone"></div>
+<div class="exhibit">
+  <div class="corner-bl"></div><div class="corner-br"></div>
+  <div class="exhibit-label">
+    <span>DIAGRAM SPACE</span>
+  </div>
+  <div class="exhibit-zone has-image" data-topic="ipsec">
+    <img src="ipsecurity1.png" alt="Diagram" style="margin-bottom: 10px;">
+    <img src="ipsecurity2.png" alt="Diagram">
+  </div>
+  <div class="exhibit-actions" style="display:flex;">
+    <button class="exhibit-replace">Replace</button>
+    <button class="exhibit-remove danger">Remove</button>
+  </div>
+  <input type="file" class="exhibit-file" accept="image/*" style="display:none;">
+</div>
+<div class="topic-footer">
+  <button class="nav-btn prev" data-nav="prev"><span class="nb-label">PREV CASE</span><span class="nb-title">--</span></button>
+  <button class="nav-btn next" data-nav="next"><span class="nb-label">NEXT CASE</span><span class="nb-title">--</span></button>
+</div>
+<label class="mark-reviewed">
+  <input type="checkbox" class="reviewed-checkbox" data-topic="ipsec">
+  I have mastered this case file
+</label>
+        
+      </section>
+
+      <section class="topic" id="ids" data-title="Intrusion Detection Systems (IDS)">
+        <div class="topic-head">
+  <div class="topic-eyebrow">
+    <span class="file-no">FILE 04</span>
+    <span class="deck-tag">INFOSEC DOSSIER</span>
+  </div>
+  <h2 class="topic-title">Intrusion Detection Systems (IDS)</h2>
+  <div class="topic-brief">Concept Notes</div>
+  <div class="file-attachment">
+    <span class="file-type-badge pptx">PPTX</span>
+    <a href="file IDS.pptx" target="_blank" class="file-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      file IDS.pptx
+    </a>
+  </div>
+</div>
+<h3><span class="num">1.</span> Core Definitions — Get These Clear First</h3>
+<p>Intruder</p>
+<p>Someone attempting to gain unauthorized access to a system or network. Could be an outsider (external attacker) or an insider (employee abusing their access).</p>
+<p>Intrusion</p>
+<p>Any set of activities that attempt to compromise the CIA triad of a resource:</p>
+<table class="data">
+<tr><th>•</th><th>Confidentiality — accessing data they shouldn't see</th></tr>
+<tr><td>•</td><td>Integrity — modifying data they shouldn't touch</td></tr>
+<tr><td>•</td><td>Availability — disrupting access to systems (DoS)</td></tr>
+</table>
+<p>This definition is important — an intrusion isn't just "hacking in." Anything that threatens CIA counts.</p>
+<h3><span class="num">2.</span> IDS — What It Is and What It Does</h3>
+<p>An Intrusion Detection System (IDS) is a device or software that:</p>
+<table class="data">
+<tr><th>•</th><th>Monitors all inbound and outbound network traffic or system activity</th></tr>
+<tr><td>•</td><td>Inspects every packet and classifies traffic as intrusive or non-intrusive</td></tr>
+<tr><td>•</td><td>Identifies suspicious patterns that may indicate an attack</td></tr>
+<tr><td>•</td><td>Reports malicious activity or policy violations to an administrator</td></tr>
+</table>
+<p>Key word: detects and reports. A basic IDS does not stop the attack — it watches and alerts. Think of it as a security camera, not a security guard.</p>
+<h3><span class="num">3.</span> IDS vs IPS — Critical Distinction</h3>
+<p>This is one of the most common exam and interview questions.</p>
+<table class="data">
+<tr><th>IDS</th><th>IPS</th></tr>
+<tr><td>Full name</td><td>Intrusion Detection System</td><td>Intrusion Prevention System</td></tr>
+<tr><td>What it does</td><td>Monitors and alerts</td><td>Monitors, alerts, and actively blocks</td></tr>
+<tr><td>Position in network</td><td>Passive — sits beside the traffic flow</td><td>Inline — sits in the traffic flow</td></tr>
+<tr><td>Action on threat</td><td>Notifies admin</td><td>Logs, reports, and stops the malicious traffic</td></tr>
+</table>
+<p>IPS = IDS + Active Response</p>
+<p>An IPS does everything an IDS does, but goes one step further — it actually attempts to block or stop malicious activity in real time, not just report it.</p>
+<h3><span class="num">4.</span> Types of IDS</h3>
+<p>NIDS — Network-Based IDS</p>
+<p>Placed at strategic points within the network (e.g., at the network perimeter, behind a firewall, at key internal segments).</p>
+<table class="data">
+<tr><th>•</th><th>Monitors traffic to and from all devices on the network from one point</th></tr>
+<tr><td>•</td><td>Analyzes protocol activity across the entire network</td></tr>
+<tr><td>•</td><td>Matches traffic against a library of known attack signatures</td></tr>
+<tr><td>•</td><td>One NIDS can protect an entire network segment</td></tr>
+</table>
+<p>Think of NIDS like a checkpoint on a highway — it watches everything passing through that point without being on any individual vehicle.</p>
+<p>HIDS — Host-Based IDS</p>
+<p>Installed as a software package on a single host (a server, workstation, or endpoint).</p>
+<table class="data">
+<tr><th>•</th><th>Monitors only the inbound and outbound packets of that specific machine</th></tr>
+<tr><td>•</td><td>Also monitors system-level activity (file changes, login attempts, process behavior)</td></tr>
+<tr><td>•</td><td>Alerts the user or admin when suspicious activity is detected on that host</td></tr>
+</table>
+<p>Think of HIDS like a personal alarm system installed in one house, as opposed to NIDS which is a neighborhood surveillance system.</p>
+<p>When to use which:</p>
+<table class="data">
+<tr><th>•</th><th>Use NIDS for broad network-level visibility</th></tr>
+<tr><td>•</td><td>Use HIDS for deep monitoring of critical individual machines (e.g., a database server)</td></tr>
+<tr><td>•</td><td>Best practice: use both together for layered coverage</td></tr>
+</table>
+<h3><span class="num">5.</span> Detection Methods</h3>
+<p>Signature-Based Detection</p>
+<p>Works exactly like antivirus software — maintains a database of known attack patterns (signatures) and compares every packet against them.</p>
+<p>A signature could be:</p>
+<table class="data">
+<tr><th>•</th><th>A specific byte sequence in network traffic</th></tr>
+<tr><td>•</td><td>A known malicious instruction pattern used by malware</td></tr>
+<tr><td>•</td><td>A pattern matching a known exploit</td></tr>
+</table>
+<p>Strengths:</p>
+<table class="data">
+<tr><th>•</th><th>Very accurate for known attacks — low false positives</th></tr>
+<tr><td>•</td><td>Fast and computationally inexpensive</td></tr>
+</table>
+<p>Weaknesses:</p>
+<table class="data">
+<tr><th>•</th><th>Completely blind to new/unknown attacks — if no signature exists, it won't detect it</th></tr>
+<tr><td>•</td><td>Signatures must be constantly updated as new attacks emerge</td></tr>
+<tr><td>•</td><td>Attackers can evade detection by slightly modifying known attack patterns (polymorphic attacks)</td></tr>
+</table>
+<p>This is why signature-based detection is called reactive — it can only catch what it's already seen before.</p>
+<p>Anomaly-Based Detection</p>
+<p>Instead of looking for known bad patterns, anomaly-based IDS first learns what normal looks like and then flags anything that deviates from it.</p>
+<p>The process:</p>
+<h3><span class="num">1.</span> Baseline establishment — the IDS monitors the network during normal operation and builds a profile: typical bandwidth usage, common protocols used, normal traffic volumes, usual connection patterns</h3>
+<h3><span class="num">2.</span> Runtime monitoring — all live traffic is compared against this baseline</h3>
+<h3><span class="num">3.</span> Deviation = alert — anything significantly outside the normal profile triggers an alert</h3>
+<p>Strengths:</p>
+<table class="data">
+<tr><th>•</th><th>Can detect new/zero-day attacks that have never been seen before — if it's abnormal, it gets flagged regardless of whether a signature exists</th></tr>
+<tr><td>•</td><td>Doesn't rely on a database that needs constant updating</td></tr>
+</table>
+<p>Weaknesses:</p>
+<table class="data">
+<tr><th>•</th><th>Higher false positive rate — legitimate but unusual activity (a big software update, a new employee) can trigger alerts</th></tr>
+<tr><td>•</td><td>Requires a training period to establish an accurate baseline</td></tr>
+<tr><td>•</td><td>If the baseline is built during a period that included malicious activity, that activity gets normalized</td></tr>
+</table>
+<h3><span class="num">6.</span> Signature-Based vs Anomaly-Based — Side by Side</h3>
+<table class="data">
+<tr><th>Signature-Based</th><th>Anomaly-Based</th></tr>
+<tr><td>Detects known attacks</td><td>✅ Excellent</td><td>✅ Yes</td></tr>
+<tr><td>Detects new/zero-day attacks</td><td>❌ No</td><td>✅ Yes</td></tr>
+<tr><td>False positives</td><td>Low</td><td>Higher</td></tr>
+<tr><td>Needs updating</td><td>Yes (signature DB)</td><td>Yes (baseline retraining)</td></tr>
+<tr><td>How it works</td><td>Match against known patterns</td><td>Deviation from normal baseline</td></tr>
+<tr><td>Analogy</td><td>Wanted poster — only catches known criminals</td><td>Neighborhood watch — flags anything unusual</td></tr>
+</table>
+<p>In practice, modern IDS/IPS systems use both methods together to balance coverage and accuracy.</p>
+<div class="cheat">
+<div class="cheat-head"><h5>Quick Reference Cheat Sheet</h5><span class="stamp-text">EXAM PREP</span></div>
+<div class="qa-grid">
+<div class="qa-card"><div class="q">What is an IDS?</div><div class="a">A system that monitors network or system activity, classifies traffic as intrusive or non-intrusive, and reports suspicious activity to an administrator. It detects but does not block by default.</div></div>
+<div class="qa-card"><div class="q">What is the difference between IDS and IPS?</div><div class="a">IDS detects and alerts. IPS detects, alerts, and actively blocks the threat. IPS is inline with traffic; IDS is passive. IPS = IDS + prevention capability.</div></div>
+<div class="qa-card"><div class="q">What is the difference between NIDS and HIDS?</div><div class="a">NIDS monitors an entire network segment from a strategic point — one NIDS protects many machines. HIDS is installed on a single machine and monitors only that host's traffic and activity.</div></div>
+<div class="qa-card"><div class="q">What is signature-based detection and what is its main weakness?</div><div class="a">It compares traffic against a database of known attack patterns. Main weakness: it cannot detect new attacks for which no signature exists yet.</div></div>
+<div class="qa-card"><div class="q">What is anomaly-based detection and what is its main weakness?</div><div class="a">It builds a baseline of normal behavior and flags deviations from it. Main weakness: higher false positive rate — legitimate unusual activity can trigger alerts.</div></div>
+<div class="qa-card"><div class="q">Why is anomaly-based detection better for zero-day attacks?</div><div class="a">Because it doesn't need to know what the attack looks like — it only needs to know that the activity is abnormal compared to the established baseline.</div></div>
+<div class="qa-card"><div class="q">What does an intrusion mean in terms of CIA?</div><div class="a">Any activity that threatens Confidentiality (unauthorized data access), Integrity (unauthorized data modification), or Availability (disruption of service).</div></div>
+<div class="qa-card"><div class="q">Can an IDS stop an attack?</div><div class="a">Basic IDS — no, it only detects and alerts. An IPS can actively stop it. Some advanced IDS can be configured to trigger automated responses, blurring the line between IDS and IPS.</div></div>
+</div></div>
+
+<div class="mcq-zone"></div>
+<div class="exhibit">
+  <div class="corner-bl"></div><div class="corner-br"></div>
+  <div class="exhibit-label">
+    <span>DIAGRAM SPACE</span>
+  </div>
+  <div class="exhibit-zone has-image" data-topic="ids">
+    <img src="temp.img" alt="Diagram">
+  </div>
+  <div class="exhibit-actions" style="display:flex;">
+    <button class="exhibit-replace">Replace</button>
+    <button class="exhibit-remove danger">Remove</button>
+  </div>
+  <input type="file" class="exhibit-file" accept="image/*" style="display:none;">
+</div>
+<div class="topic-footer">
+  <button class="nav-btn prev" data-nav="prev"><span class="nb-label">PREV CASE</span><span class="nb-title">--</span></button>
+  <button class="nav-btn next" data-nav="next"><span class="nb-label">NEXT CASE</span><span class="nb-title">--</span></button>
+</div>
+<label class="mark-reviewed">
+  <input type="checkbox" class="reviewed-checkbox" data-topic="ids">
+  I have mastered this case file
+</label>
+        
+      </section>
+
+      <section class="topic" id="firewall-vpn" data-title="Firewall &amp; VPN">
+        <div class="topic-head">
+  <div class="topic-eyebrow">
+    <span class="file-no">FILE 05</span>
+    <span class="deck-tag">INFOSEC DOSSIER</span>
+  </div>
+  <h2 class="topic-title">Firewall & VPN</h2>
+  <div class="topic-brief">Study Notes</div>
+  <div class="file-attachment">
+    <span class="file-type-badge pptx">PPTX</span>
+    <a href="file Firewall & VPN (1).pptx" target="_blank" class="file-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      file Firewall & VPN (1).pptx
+    </a>
+  </div>
+</div>
+<h3><span class="num">1.</span> What Is a Firewall?</h3>
+<p>A firewall is a gatekeeper between two networks — typically your internal (trusted) network and the external (untrusted) internet. Every packet that tries to cross that boundary gets inspected against a ruleset. If it matches an allow rule, it passes. If it doesn't, it's dropped.</p>
+<p>Think of it like a bouncer at a club: the bouncer doesn't know every person, but they know the rules — and anything that doesn't fit the rules doesn't get in.</p>
+<h3><span class="num">2.</span> Forms a Firewall Can Take</h3>
+<p>Firewalls aren't one thing — they're a concept implemented at different layers of infrastructure:</p>
+<table class="data">
+<tr><th>Form</th><th>What It Is</th></tr>
+<tr><td>Hardware Firewall</td><td>A dedicated physical device placed between your LAN and the WAN (internet). Has multiple network interfaces — one facing inside, one facing outside. Filters before traffic even hits your servers.</td></tr>
+<tr><td>Software Firewall</td><td>Installed directly on an OS (Windows Defender Firewall, iptables on Linux). Inspects packets arriving at and leaving that specific machine.</td></tr>
+<tr><td>Router-as-Firewall</td><td>Routers can enforce Access Control Lists (ACLs) — rules that deny traffic based on IP, protocol, or port. Not as feature-rich as a dedicated firewall, but better than nothing at the edge.</td></tr>
+</table>
+<p>Key distinction: Hardware firewalls protect the entire network. Software firewalls protect the individual host. In a layered security model, you want both.</p>
+<h3><span class="num">3.</span> Firewalls & IDS — How They Work Together</h3>
+<p>A firewall by itself is reactive — it enforces rules. An Intrusion Detection System (IDS) is the analyst watching for patterns that look like attacks, even if they technically pass the firewall rules.</p>
+<p>IDS usually sits behind the firewall, watching traffic that was already allowed through. If the IDS sees something suspicious (port scan patterns, unusual payload signatures), it can alert the firewall or a SIEM to take action.</p>
+<h3><span class="num">4.</span> Types of Firewalls</h3>
+<p>4.1 Packet Filtering Firewall</p>
+<p>The simplest and oldest type. Operates at Layer 3 (Network) and Layer 4 (Transport) of the OSI model.</p>
+<p>What it checks:</p>
+<table class="data">
+<tr><th>•</th><th>Source IP address</th></tr>
+<tr><td>•</td><td>Destination IP address</td></tr>
+<tr><td>•</td><td>Protocol (TCP, UDP, ICMP)</td></tr>
+<tr><td>•</td><td>Port numbers</td></tr>
+</table>
+<p>How it works: Each packet is evaluated against a static ruleset — entirely stateless. It doesn't care about the context of the packet. It doesn't know if a packet is part of an established session or a random probe — it just checks the header values.</p>
+<p>Limitation: Because it's stateless, it can be fooled by crafted packets that have valid-looking headers but belong to no legitimate session.</p>
+<p>4.2 Proxy Firewall (Application-Level Gateway)</p>
+<p>Operates at Layer 7 (Application). Instead of just reading headers, the proxy terminates the connection itself, inspects the full content, then makes a new connection to the destination on behalf of the client.</p>
+<p>What this means in practice:</p>
+<table class="data">
+<tr><th>•</th><th>The external world never communicates directly with your internal hosts — they talk to the proxy.</th></tr>
+<tr><td>•</td><td>The proxy can inspect and filter the actual content of traffic (HTTP requests, FTP commands, DNS queries), not just the packet headers.</td></tr>
+<tr><td>•</td><td>Can do content caching (speeds up repeated requests) and deep inspection (blocks malicious payloads inside allowed protocols).</td></tr>
+</table>
+<p>Limitation: Slower than packet filtering because it's doing significantly more work per connection. Also needs a separate proxy per application protocol.</p>
+<p>4.3 Stateful Inspection Firewall</p>
+<p>The modern standard. Operates at Layers 3–4 but adds one critical capability: it tracks the state of network connections.</p>
+<p>What "state" means: When a client opens a TCP connection (SYN → SYN-ACK → ACK), the firewall records that this session exists. It knows which connections are established, which are new, and which are invalid. A packet claiming to be part of a session that was never opened gets dropped immediately.</p>
+<p>What it evaluates:</p>
+<table class="data">
+<tr><th>•</th><th>State (new, established, related, invalid)</th></tr>
+<tr><td>•</td><td>Port and protocol</td></tr>
+<tr><td>•</td><td>Administrator-defined rules</td></tr>
+<tr><td>•</td><td>Context built up over the session lifetime</td></tr>
+</table>
+<p>Why it's better than packet filtering: A packet filtering firewall would allow any inbound TCP packet if the port is open. A stateful firewall only allows inbound packets that are responses to connections initiated from inside. That's the difference between "open port" and "open session."</p>
+<h3><span class="num">5.</span> Firewall Type Comparison</h3>
+<table class="data">
+<tr><th>Feature</th><th>Packet Filtering</th><th>Proxy Firewall</th><th>Stateful Inspection</th></tr>
+<tr><td>OSI Layer</td><td>3–4</td><td>7</td><td>3–4</td></tr>
+<tr><td>Speed</td><td>Fast</td><td>Slow</td><td>Medium–Fast</td></tr>
+<tr><td>Tracks Sessions?</td><td>No</td><td>Yes (per connection)</td><td>Yes (connection table)</td></tr>
+<tr><td>Content Inspection?</td><td>No</td><td>Yes</td><td>No</td></tr>
+<tr><td>Complexity</td><td>Low</td><td>High</td><td>Medium</td></tr>
+<tr><td>Common Use</td><td>Edge routers, simple perimeters</td><td>Web proxies, app gateways</td><td>Enterprise firewalls</td></tr>
+</table>
+<h3><span class="num">6.</span> Virtual Private Networks (VPN)</h3>
+<p>6.1 The Problem VPNs Solve</p>
+<p>The internet is a shared, untrusted medium. If you need two private networks to communicate over it — or a remote employee to access internal resources — any data transmitted travels through infrastructure you don't control. Without protection, that data can be intercepted.</p>
+<p>VPNs solve this by creating an encrypted tunnel over the public internet, making that communication behave like a private connection even though it's riding shared infrastructure.</p>
+<p>6.2 How It Works</p>
+<h3><span class="num">1.</span> The VPN client (on the remote machine or branch office router) initiates a connection to the VPN server (hosted on the corporate network or a dedicated VPN appliance).</h3>
+<h3><span class="num">2.</span> Both sides authenticate (certificates, credentials, pre-shared keys).</h3>
+<h3><span class="num">3.</span> An encrypted tunnel is established — all traffic flows through it, encrypted end-to-end.</h3>
+<h3><span class="num">4.</span> From the application's perspective, it looks like a direct private connection.</h3>
+<p>The tunnel is often called a "virtual" connection because it doesn't require dedicated physical infrastructure — it reuses existing internet links but wraps the traffic in encryption.</p>
+<p>6.3 VPN vs. Leased Lines</p>
+<p>Before VPNs became practical, organizations connecting branch offices used private leased lines — dedicated physical circuits from a telco. Secure by isolation, but extremely expensive and inflexible.</p>
+<p>VPNs replaced this model by achieving the same security goal (encrypted, private communication) using the cheaper, already-existing internet. The tradeoff is that VPN performance is subject to internet link quality, while a leased line is dedicated.</p>
+<p>6.4 VPN Server Implementations</p>
+<p>VPN servers aren't magic boxes — they run on one of two things:</p>
+<table class="data">
+<tr><th>•</th><th>Server OS with VPN software (Windows Server + RRAS, Linux with OpenVPN/WireGuard, etc.)</th></tr>
+<tr><td>•</td><td>Dedicated VPN appliance — hardware designed specifically to handle VPN connections at scale, with no other job. More performant for high-connection-count environments.</td></tr>
+</table>
+<p>6.5 Use Cases</p>
+<table class="data">
+<tr><th>Use Case</th><th>What's Happening</th></tr>
+<tr><td>Remote Employee Access</td><td>Laptop connects to corporate VPN → traffic is encrypted → employee can access internal resources as if physically in the office</td></tr>
+<tr><td>Site-to-Site (Branch Offices)</td><td>Two office routers establish a permanent VPN tunnel → both LANs appear as one unified network</td></tr>
+<tr><td>Replacing WAN Links</td><td>VPN over internet replaces expensive dedicated WAN circuits between offices</td></tr>
+<tr><td>Reducing ISP Support Costs</td><td>VPN management is handled internally or by the VPN vendor — less reliance on expensive telco WAN support contracts</td></tr>
+</table>
+<p>6.6 Security Posture</p>
+<p>Once the VPN tunnel is established and the encryption is sound, the channel is practically infeasible to exploit from outside. An attacker intercepting the packets would see encrypted ciphertext with no practical way to decrypt it in reasonable time.</p>
+<p>The attack surface shifts: the threats become endpoint compromise (attacking the client machine before it enters the tunnel), credential theft (stealing the credentials used to authenticate to the VPN), or VPN software vulnerabilities (exploiting bugs in the VPN server implementation itself) — not the tunnel traffic.</p>
+<h3><span class="num">7.</span> Quick-Reference Summary</h3>
+<table class="data">
+<tr><th>Concept</th><th>One-Line Takeaway</th></tr>
+<tr><td>Firewall</td><td>Enforces rules on traffic crossing a network boundary</td></tr>
+<tr><td>Packet Filtering</td><td>Stateless, checks headers only, fast but exploitable</td></tr>
+<tr><td>Proxy Firewall</td><td>Terminates & re-initiates connections, full content inspection, slowest</td></tr>
+<tr><td>Stateful Inspection</td><td>Tracks session state, drops packets with no matching session, modern standard</td></tr>
+<tr><td>VPN</td><td>Encrypted tunnel over public internet that mimics a private connection</td></tr>
+<tr><td>VPN Tunnel</td><td>Authentication → key exchange → encrypted channel</td></tr>
+<tr><td>VPN vs Leased Line</td><td>Same security goal, VPN is cheaper and uses existing infrastructure</td></tr>
+</table>
+
+<div class="mcq-zone"></div>
+<div class="exhibit">
+  <div class="corner-bl"></div><div class="corner-br"></div>
+  <div class="exhibit-label">
+    <span>DIAGRAM SPACE</span>
+  </div>
+  <div class="exhibit-zone has-image" data-topic="firewall-vpn">
+    <img src="firewall1.png" alt="Diagram">
+  </div>
+  <div class="exhibit-actions" style="display:flex;">
+    <button class="exhibit-replace">Replace</button>
+    <button class="exhibit-remove danger">Remove</button>
+  </div>
+  <input type="file" class="exhibit-file" accept="image/*" style="display:none;">
+</div>
+<div class="topic-footer">
+  <button class="nav-btn prev" data-nav="prev"><span class="nb-label">PREV CASE</span><span class="nb-title">--</span></button>
+  <button class="nav-btn next" data-nav="next"><span class="nb-label">NEXT CASE</span><span class="nb-title">--</span></button>
+</div>
+<label class="mark-reviewed">
+  <input type="checkbox" class="reviewed-checkbox" data-topic="firewall-vpn">
+  I have mastered this case file
+</label>
+        
+      </section>
+
+      <section class="topic" id="auth-vuln" data-title="Authentication &amp; Its Vulnerabilities">
+        <div class="topic-head">
+  <div class="topic-eyebrow">
+    <span class="file-no">FILE 06</span>
+    <span class="deck-tag">INFOSEC DOSSIER</span>
+  </div>
+  <h2 class="topic-title">Authentication & Its Vulnerabilities</h2>
+  <div class="topic-brief">Study Notes</div>
+  <div class="file-attachment">
+    <span class="file-type-badge pptx">PPTX</span>
+    <a href="file Authentication ans its Vulnerabilities.pptx" target="_blank" class="file-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      file Authentication ans its Vulnerabilities.pptx
+    </a>
+  </div>
+</div>
+<h3><span class="num">1.</span> What Is Authentication?</h3>
+<p>Authentication is the process of verifying that a user is who they claim to be. It's the first security gate before authorization (what the user is allowed to do) even kicks in.</p>
+<p>Common mechanisms:</p>
+<table class="data">
+<tr><th>•</th><th>HTML form-based login (username + password)</th></tr>
+<tr><td>•</td><td>Multi-factor authentication (MFA)</td></tr>
+<tr><td>•</td><td>Windows-integrated auth (NTLM / Kerberos — challenge-response protocols, no password sent over the wire)</td></tr>
+</table>
+<p>Authentication vulnerabilities don't usually come from broken cryptography — they come from insecure implementation of these mechanisms. The math is fine; the code around it isn't.</p>
+<h3><span class="num">2.</span> Authentication Vulnerabilities — The Full Taxonomy</h3>
+<p>2.1 Weak Password Requirements</p>
+<p>The application puts no meaningful constraints on what a password can be. This means users can set passwords that are trivially guessable or crackable.</p>
+<p>What weak looks like:</p>
+<table class="data">
+<tr><th>•</th><th>Blank or single-character passwords allowed</th></tr>
+<tr><td>•</td><td>Common dictionary words (password, letmein, 123456)</td></tr>
+<tr><td>•</td><td>Password identical to the username</td></tr>
+<tr><td>•</td><td>Default credentials never changed (admin/admin)</td></tr>
+<tr><td>•</td><td>No MFA, or MFA that can be bypassed</td></tr>
+</table>
+<p>Why it matters: An attacker doesn't need to break encryption if the password is password. The weakest link in a system is usually a credential, not an algorithm.</p>
+<p>Reference: CASMM Consumer Authentication Security Maturity Model</p>
+<p>2.2 Improper Restriction of Authentication Attempts</p>
+<p>The application allows unlimited login attempts — no lockout, no rate limiting, no CAPTCHA — making brute-force attacks trivially feasible.</p>
+<p>Vulnerable surfaces (this applies to all of them, not just login):</p>
+<table class="data">
+<tr><th>•</th><th>Login page</th></tr>
+<tr><td>•</td><td>OTP / MFA page</td></tr>
+<tr><td>•</td><td>Password change page</td></tr>
+</table>
+<p>What brute force looks like in practice: An attacker uses a tool like Hydra or Burp Intruder to systematically try thousands of passwords per second. If the server doesn't throttle or lock the account, it's a waiting game the attacker will eventually win.</p>
+<p>What a lockout bypass looks like: Some applications implement lockouts per-IP rather than per-account. Rotating IPs (via proxies or distributed attack infrastructure) defeats this entirely.</p>
+<p>2.3 Verbose Error Messages (Username Enumeration)</p>
+<p>The application tells you which part of the credential was wrong.</p>
+<table class="data">
+<tr><th>Response</th><th>What It Leaks</th></tr>
+<tr><td>Incorrect username.</td><td>Confirms the username doesn't exist → helps build a valid username list</td></tr>
+<tr><td>Incorrect password.</td><td>Confirms the username does exist → now attacker only needs to crack the password</td></tr>
+</table>
+<p>Why this is dangerous: Username enumeration converts a two-variable brute-force problem (username + password) into a one-variable problem (just the password). The attack surface is cut in half.</p>
+<p>The fix is simple: A single generic message like "Invalid username or password." gives the attacker nothing to work with.</p>
+<p>2.4 Vulnerable Transmission of Credentials</p>
+<p>Credentials submitted over HTTP (plaintext) can be intercepted by anyone on the network path — at the ISP level, on shared Wi-Fi, or via a man-in-the-middle attack.</p>
+<p>What to look for:</p>
+<table class="data">
+<tr><th>•</th><th>Login form that submits to http:// instead of https://</th></tr>
+<tr><td>•</td><td>Credentials appearing in a URL query string (?username=admin&password=1234) — these get logged in browser history, server logs, and proxy logs</td></tr>
+<tr><td>•</td><td>Credentials sent back from server to client in a response body or cookie</td></tr>
+</table>
+<p>The fix: All credential transmission must use HTTPS. Credentials must only travel in POST request bodies, never in URLs.</p>
+<p>2.5 Insecure Forgot Password Functionality</p>
+<p>Password reset is often the weakest link in the entire authentication chain — even when the login page itself is hardened.</p>
+<p>Common flaws:</p>
+<table class="data">
+<tr><th>Flaw</th><th>How It's Exploited</th></tr>
+<tr><td>Reset URL is predictable</td><td>Attacker generates the URL for another user without receiving the email</td></tr>
+<tr><td>Reset link never expires</td><td>An old intercepted link can be used indefinitely</td></tr>
+<tr><td>Reset flow leaks username existence</td><td>"Email not found" confirms which accounts exist</td></tr>
+<tr><td>Security questions as the only factor</td><td>Answers are often publicly available or guessable</td></tr>
+</table>
+<p>Why it matters: You can have a perfect login page and still lose the account because the reset flow was designed without the same scrutiny.</p>
+<p>2.6 Defects in Multistage Login Mechanisms</p>
+<p>When a login process spans multiple steps (e.g., password first, then OTP), the application sometimes makes a dangerous assumption: it trusts that whoever reaches step 2 successfully completed step 1.</p>
+<p>The classic exploit:</p>
+<p>REQUEST 1 — Step 1 (attacker authenticates as themselves)</p>
+<p>POST /login-steps/first</p>
+<p>username=attacker&password=theirpassword</p>
+<p>REQUEST 2 — Step 2 (attacker tampers with the session)</p>
+<p>POST /login-steps/second</p>
+<p>Cookie: account=victim_username</p>
+<p>verification-code=123456</p>
+<p>If the server only validates the OTP at step 2 and trusts the account cookie without re-verifying step 1 completed for that account, the attacker can substitute the victim's username and bypass the full authentication chain.</p>
+<p>Root cause: State from one step isn't cryptographically bound to the user who completed the previous step.</p>
+<p>2.7 Insecure Storage of Credentials</p>
+<p>How passwords are stored in the database matters as much as how they're transmitted.</p>
+<table class="data">
+<tr><th>Storage Method</th><th>What Happens If DB Is Breached</th></tr>
+<tr><td>Plaintext</td><td>Every credential is immediately exposed</td></tr>
+<tr><td>Encrypted (reversible)</td><td>If the key is compromised, all passwords decrypt instantly</td></tr>
+<tr><td>Weakly hashed (MD5, SHA1, unsalted)</td><td>Pre-computed rainbow tables crack them in seconds</td></tr>
+<tr><td>Properly hashed (bcrypt, Argon2, scrypt + salt)</td><td>Attacker must crack each hash individually, computationally expensive</td></tr>
+</table>
+<p>Salt: A random value added to the password before hashing. Ensures two users with the same password produce different hashes, defeating rainbow table attacks.</p>
+<h3><span class="num">3.</span> Impact</h3>
+<p>Authentication failures have cascading consequences:</p>
+<table class="data">
+<tr><th>•</th><th>Unauthorized access — attacker reaches functionality they have no right to use</th></tr>
+<tr><td>•</td><td>Confidentiality — reads other users' data</td></tr>
+<tr><td>•</td><td>Integrity — modifies other users' data</td></tr>
+<tr><td>•</td><td>Availability — deletes accounts or data</td></tr>
+<tr><td>•</td><td>Escalation path — authentication bypass often chains into privilege escalation, which chains into remote code execution (RCE) on the underlying OS</td></tr>
+</table>
+<p>This is why authentication failures consistently appear in the OWASP Top 10 (A07: Identification and Authentication Failures).</p>
+<h3><span class="num">4.</span> How to Find and Exploit Authentication Flaws</h3>
+<p>4.1 Testing Weak Password Policy</p>
+<h3><span class="num">1.</span> If self-registration is available, try registering with weak passwords — very short, dictionary words, same as username, blank. Note which ones the application accepts.</h3>
+<h3><span class="num">2.</span> If you control an account with a password-change feature, attempt to set weak passwords and observe the response.</h3>
+<h3><span class="num">3.</span> Document exactly where the policy enforces or fails to enforce constraints.</h3>
+<p>4.2 Testing Brute Force Protection</p>
+<h3><span class="num">1.</span> Manually submit ~10 failed login attempts on an account you control.</h3>
+<h3><span class="num">2.</span> If no lockout message appears, attempt a correct login — if it succeeds, there is no lockout mechanism.</h3>
+<h3><span class="num">3.</span> Run an automated brute-force with Hydra or Burp Intruder.</h3>
+<h3><span class="num">4.</span> If the account does lock, monitor the HTTP responses — check if the lockout mechanism itself is exploitable (e.g., resets on IP change, can be bypassed with X-Forwarded-For header manipulation).</h3>
+<h3><span class="num">5.</span> Apply to every authentication surface — not just the login page.</h3>
+<p>4.3 Testing Username Enumeration</p>
+<h3><span class="num">1.</span> Submit a valid username with a wrong password → note the response.</h3>
+<h3><span class="num">2.</span> Submit an invalid username → note the response.</h3>
+<h3><span class="num">3.</span> Compare: status codes, redirect behavior, on-screen message, HTML source, response timing (timing differences can leak validity even when messages are identical).</h3>
+<h3><span class="num">4.</span> If any difference exists, build a username list using Burp Intruder or a custom script.</h3>
+<p>4.4 Testing Credential Transmission</p>
+<h3><span class="num">1.</span> Perform a login while proxying all traffic (Burp Suite).</h3>
+<h3><span class="num">2.</span> Check: Is the form submitting to http:// or https://?</h3>
+<h3><span class="num">3.</span> Check: Are credentials appearing in the URL query string or cookie?</h3>
+<h3><span class="num">4.</span> Check: Does accessing http:// redirect to https://, or does it accept plaintext credentials directly?</h3>
+<p>4.5 Testing Forgot Password Functionality</p>
+<h3><span class="num">1.</span> Walk through the entire forgot-password flow with an account you control, intercepting all requests.</h3>
+<h3><span class="num">2.</span> Check for username enumeration (does "email not found" vs "email sent" differ?).</h3>
+<h3><span class="num">3.</span> Capture multiple reset URLs and look for predictable patterns (sequential IDs, timestamps, deterministic tokens).</h3>
+<h3><span class="num">4.</span> Test if the reset link expires after use or after time passes — click an old link.</h3>
+<h3><span class="num">5.</span> Check if the flow allows brute-forcing the reset token.</h3>
+<p>4.6 Testing Multistage Login</p>
+<h3><span class="num">1.</span> Walk through the full multistage login with your account, intercepting all requests.</h3>
+<h3><span class="num">2.</span> At step 2, change any session identifier (cookie, hidden field, parameter) to point to a different account.</h3>
+<h3><span class="num">3.</span> Check if the server validates that step 1 was completed for that specific account, or just trusts what the client sends.</h3>
+<p>4.7 Testing Credential Storage</p>
+<table class="data">
+<tr><th>•</th><th>If RCE is achieved, inspect the backend database directly — check hash algorithm and whether salts are present.</th></tr>
+<tr><td>•</td><td>If you can observe passwords transmitted back to the client at any point (in a response, cookie, or HTML source), that indicates plaintext storage.</td></tr>
+<tr><td>•</td><td>If on a pentest, conduct developer interviews to verify storage practices in the absence of direct DB access.</td></tr>
+</table>
+<h3><span class="num">5.</span> How to Prevent Authentication Vulnerabilities</h3>
+<p>Mandatory Controls</p>
+<table class="data">
+<tr><th>Control</th><th>Why It Matters</th></tr>
+<tr><td>Implement MFA</td><td>Even if a password is compromised, the attacker still can't authenticate without the second factor</td></tr>
+<tr><td>Change all default credentials</td><td>Default creds are publicly documented — any attacker's first attempt</td></tr>
+<tr><td>Use HTTPS for all credential transmission</td><td>Eliminates interception on the network path</td></tr>
+<tr><td>POST only for credentials</td><td>Prevents credentials from appearing in URLs, logs, and browser history</td></tr>
+<tr><td>Hash + salt passwords with strong algorithms</td><td>bcrypt, Argon2, or scrypt — MD5/SHA1 are dead for this purpose</td></tr>
+<tr><td>Generic error messages</td><td>Never distinguish between wrong username vs wrong password</td></tr>
+</table>
+<p>Password Policy</p>
+<table class="data">
+<tr><th>•</th><th>Follow NIST 800-63-b guidelines: prioritize length over complexity requirements, check passwords against known-breached lists</th></tr>
+<tr><td>•</td><td>Implement real-time strength feedback using a library like zxcvbn (evaluates actual password entropy, not just character class rules)</td></tr>
+</table>
+<p>Brute Force Protection</p>
+<table class="data">
+<tr><th>•</th><th>Rate limiting per account (not per IP — IPs rotate)</th></tr>
+<tr><td>•</td><td>Temporary account lockout with progressive delay</td></tr>
+<tr><td>•</td><td>CAPTCHA on repeated failures</td></tr>
+<tr><td>•</td><td>Protect all authentication endpoints — login, MFA, password reset, account unlock</td></tr>
+</table>
+<p>Audit and Review</p>
+<table class="data">
+<tr><th>•</th><th>Audit all validation logic — multistage flows especially — to ensure state from step N can't be manipulated to bypass step N-1</th></tr>
+<tr><td>•</td><td>Reference: OWASP ASVS V2 (Authentication Verification Requirements)</td></tr>
+</table>
+
+<div class="mcq-zone"></div>
+<div class="exhibit">
+  <div class="corner-bl"></div><div class="corner-br"></div>
+  <div class="exhibit-label">
+    <span>DIAGRAM SPACE</span>
+  </div>
+  <div class="exhibit-zone has-image" data-topic="auth-vuln">
+    <img src="user auth.png" alt="Diagram">
+  </div>
+  <div class="exhibit-actions" style="display:flex;">
+    <button class="exhibit-replace">Replace</button>
+    <button class="exhibit-remove danger">Remove</button>
+  </div>
+  <input type="file" class="exhibit-file" accept="image/*" style="display:none;">
+</div>
+<div class="topic-footer">
+  <button class="nav-btn prev" data-nav="prev"><span class="nb-label">PREV CASE</span><span class="nb-title">--</span></button>
+  <button class="nav-btn next" data-nav="next"><span class="nb-label">NEXT CASE</span><span class="nb-title">--</span></button>
+</div>
+<label class="mark-reviewed">
+  <input type="checkbox" class="reviewed-checkbox" data-topic="auth-vuln">
+  I have mastered this case file
+</label>
+        
+      </section>
+
+      <section class="topic" id="kerberos" data-title="User Authentication &amp; Kerberos">
+        <div class="topic-head">
+  <div class="topic-eyebrow">
+    <span class="file-no">FILE 07</span>
+    <span class="deck-tag">INFOSEC DOSSIER</span>
+  </div>
+  <h2 class="topic-title">User Authentication & Kerberos</h2>
+  <div class="topic-brief">Study Notes</div>
+  <div class="file-attachment">
+    <span class="file-type-badge pdf">PDF</span>
+    <a href="file User Authentication.pdf" target="_blank" class="file-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      file User Authentication.pdf
+    </a>
+  </div>
+</div>
+<h3><span class="num">1.</span> What Is User Authentication?</h3>
+<p>Authentication is the process of verifying an identity claimed by or for a system entity. It answers one question: Is this entity actually who they say they are?</p>
+<p>Two-Step Process</p>
+<p>Every authentication process has the same two-phase structure:</p>
+<h3><span class="num">1.</span> Identification — The entity presents an identity (e.g., a username, a certificate, a token).</h3>
+<h3><span class="num">2.</span> Verification — The system validates that the claimed identity is genuine using some authenticating factor.</h3>
+<p>Means of Authentication</p>
+<p>Authentication factors fall into four categories:</p>
+<table class="data">
+<tr><th>Factor</th><th>What It Is</th><th>Example</th></tr>
+<tr><td>Something you know</td><td>A secret the user holds mentally</td><td>Password, PIN</td></tr>
+<tr><td>Something you have</td><td>A physical token or device</td><td>Smart card, OTP hardware token</td></tr>
+<tr><td>Something you are</td><td>A biometric characteristic</td><td>Fingerprint, iris scan</td></tr>
+<tr><td>Something you do</td><td>A behavioral pattern</td><td>Typing rhythm, signature dynamics</td></tr>
+</table>
+<p>For network-based authentication, the two most important mechanisms are:</p>
+<table class="data">
+<tr><th>•</th><th>Cryptographic keys — mathematically verifiable, don't require transmitting a secret</th></tr>
+<tr><td>•</td><td>Passwords — something the user knows; simpler but requires careful handling to avoid interception or replay</td></tr>
+</table>
+<h3><span class="num">2.</span> The Problem With Network Authentication</h3>
+<p>When users authenticate over a network, several threats exist that don't apply to local login:</p>
+<table class="data">
+<tr><th>Threat</th><th>What's Happening</th></tr>
+<tr><td>Impersonation at the workstation</td><td>A user sits at someone else's machine and claims to be that person — the workstation can't verify this</td></tr>
+<tr><td>IP spoofing</td><td>An attacker forges the source IP address of their packets to appear as a trusted machine</td></tr>
+<tr><td>Replay attack</td><td>An attacker captures authentication traffic and retransmits it later to gain access, without ever knowing the actual credential</td></tr>
+</table>
+<p>The core issue: a workstation cannot be trusted to correctly identify its users to the network. The identity check must happen at a level above the individual machine.</p>
+<p>This is the problem Kerberos was built to solve.</p>
+<h3><span class="num">3.</span> Kerberos</h3>
+<p>Background</p>
+<p>Kerberos was developed at MIT as part of Project Athena — a large-scale networked computing initiative. The goal was a way to authenticate users to services on a network where no individual machine or link could be trusted.</p>
+<p>Core design choices:</p>
+<table class="data">
+<tr><th>•</th><th>Centralized authentication — a single trusted server handles all identity verification</th></tr>
+<tr><td>•</td><td>Symmetric encryption only — no public-key cryptography (by design, for performance and simplicity at the time)</td></tr>
+<tr><td>•</td><td>Mutual authentication — both the client and the server prove their identity to each other, not just the client to the server</td></tr>
+<tr><td>•</td><td>Ticket-based — after initial login, a user never re-sends their password; they exchange cryptographic tickets instead</td></tr>
+</table>
+<p>3.1 The Threat Model Kerberos Addresses</p>
+<p>Kerberos is explicitly designed against:</p>
+<table class="data">
+<tr><th>•</th><th>A malicious user pretending to be another user on a shared workstation</th></tr>
+<tr><td>•</td><td>An attacker spoofing a machine's network address to impersonate a trusted host</td></tr>
+<tr><td>•</td><td>An attacker capturing authentication packets and replaying them to fool a server</td></tr>
+</table>
+<p>By moving trust to a central authentication server and using time-bound encrypted tickets, all three attacks are defeated.</p>
+<p>3.2 Core Concept — The Ticket System</p>
+<p>Kerberos replaces "send your password to every service you want to use" with a two-tier ticket system:</p>
+<p>Password (once at login) → Master Ticket (Ticket-Granting Ticket)</p>
+<p>↓</p>
+<p>Present to KDC → Service Ticket (per service)</p>
+<p>↓</p>
+<p>Present to Service → Access Granted</p>
+<p>The password is sent exactly once — at initial logon. Everything after that uses cryptographic tickets that prove identity without retransmitting the password.</p>
+<p>3.3 Key Components</p>
+<p>Key Distribution Center (KDC)</p>
+<p>The central trusted authority. It has two logical sub-components:</p>
+<p>Authentication Server (AS)</p>
+<table class="data">
+<tr><th>•</th><th>Holds a database of all user passwords (as keys derived from those passwords)</th></tr>
+<tr><td>•</td><td>Shares a unique secret key with every service on the network</td></tr>
+<tr><td>•</td><td>Verifies the user's identity at logon and issues a Ticket-Granting Ticket (TGT)</td></tr>
+</table>
+<p>Ticket-Granting Server (TGS)</p>
+<table class="data">
+<tr><th>•</th><th>Issues service tickets to users who present a valid TGT</th></tr>
+<tr><td>•</td><td>The user never goes back to the AS — the TGT is their proof that the AS already authenticated them</td></tr>
+<tr><td>•</td><td>For each new service the user wants to access, they present the TGT to the TGS and receive a service-specific ticket</td></tr>
+</table>
+<p>Ticket-Granting Ticket (TGT) — "The Master Ticket"</p>
+<table class="data">
+<tr><th>•</th><th>Issued once at login after the AS verifies the user's password</th></tr>
+<tr><td>•</td><td>Encrypted with a key known only to the TGS — the client cannot read or forge it</td></tr>
+<tr><td>•</td><td>Contains: user ID, user's network address, timestamp, validity period, session key</td></tr>
+<tr><td>•</td><td>Used to request service tickets without re-entering the password</td></tr>
+</table>
+<p>Service Ticket</p>
+<table class="data">
+<tr><th>•</th><th>Issued by the TGS for a specific service (e.g., a file server, mail server)</th></tr>
+<tr><td>•</td><td>Encrypted with the key shared between the KDC and that specific service — the client cannot read it either</td></tr>
+<tr><td>•</td><td>The client presents it to the service, which decrypts it and verifies the user's identity</td></tr>
+<tr><td>•</td><td>Functions like a session key — valid for a limited time window</td></tr>
+</table>
+<p>3.4 Kerberos Authentication Flow (Version 4)</p>
+<p>Step 1 — User logs in</p>
+<p>Client sends username to the AS (password is NOT sent yet)</p>
+<p>Step 2 — AS verifies and responds</p>
+<p>AS looks up the user in its database.</p>
+<p>AS creates:</p>
+<ul>
+<li>A TGT (encrypted with the TGS's secret key)</li>
+<li>A session key for client ↔ TGS communication</li>
+</ul>
+<p>Both are encrypted using a key derived from the user's password.</p>
+<p>Response sent to client.</p>
+<p>Step 3 — Client decrypts with password</p>
+<p>Client uses the password the user typed to derive the key and decrypt the response.</p>
+<p>Client now holds: the TGT (opaque, can't read it) + session key.</p>
+<p>Password is no longer needed and is discarded from memory.</p>
+<p>Step 4 — User wants to access a service</p>
+<p>Client sends to TGS:</p>
+<ul>
+<li>The TGT (still encrypted, untouched)</li>
+<li>An authenticator (client ID + timestamp, encrypted with session key)</li>
+<li>The name of the service being requested</li>
+</ul>
+<p>Step 5 — TGS responds with a service ticket</p>
+<p>TGS decrypts the TGT, validates it, checks the authenticator timestamp.</p>
+<p>TGS creates:</p>
+<ul>
+<li>A service ticket (encrypted with the service's secret key)</li>
+<li>A new session key for client ↔ service communication</li>
+</ul>
+<p>Step 6 — Client accesses the service</p>
+<p>Client sends to the target service:</p>
+<ul>
+<li>The service ticket (opaque to client)</li>
+<li>A new authenticator encrypted with the client-service session key</li>
+</ul>
+<p>Step 7 — Mutual authentication</p>
+<p>Service decrypts the ticket, extracts the session key, decrypts the authenticator.</p>
+<p>If the timestamp is valid → client is authenticated.</p>
+<p>Service sends back a response encrypted with the session key → client is authenticated TO the server.</p>
+<p>Both sides have now verified each other.</p>
+<p>3.5 Why the Ticket System Is Secure</p>
+<table class="data">
+<tr><th>Property</th><th>How Kerberos Achieves It</th></tr>
+<tr><td>Password sent only once</td><td>After login, only tickets travel the network — never the password again</td></tr>
+<tr><td>Replay attack prevention</td><td>Tickets include timestamps; a replayed ticket is outside the validity window and rejected</td></tr>
+<tr><td>IP spoofing mitigation</td><td>Tickets include the client's network address; a ticket presented from a different IP is invalid</td></tr>
+<tr><td>Mutual authentication</td><td>Both client and server prove identity — the server sends back a verifiable response the client can check</td></tr>
+<tr><td>No plaintext secrets over the wire</td><td>Everything is encrypted with symmetric keys; the KDC never transmits passwords</td></tr>
+</table>
+<p>3.6 Kerberos Version 4 — Technical Details</p>
+<table class="data">
+<tr><th>•</th><th>Encryption algorithm: DES (Data Encryption Standard)</th></tr>
+<tr><td>•</td><td>The AS maintains a database of all users' password-derived keys</td></tr>
+<tr><td>•</td><td>The AS shares a unique secret key with each service on the network (pre-shared, out of band)</td></tr>
+<tr><td>•</td><td>Tickets are not readable by the client — they are sealed for the target server only</td></tr>
+<tr><td>•</td><td>The client caches service tickets — if it needs the same service again within the ticket's validity window, it reuses the cached ticket without going back to the TGS</td></tr>
+</table>
+<h3><span class="num">4.</span> Summary Comparison — Authentication Methods for Networks</h3>
+<table class="data">
+<tr><th>Mechanism</th><th>Symmetric Crypto</th><th>Public-Key Crypto</th><th>Centralized Auth</th><th>Mutual Auth</th><th>Password Sent Over Wire?</th></tr>
+<tr><td>Basic Password (no protocol)</td><td>No</td><td>No</td><td>No</td><td>No</td><td>Yes (vulnerable)</td></tr>
+<tr><td>Kerberos</td><td>Yes (DES / AES)</td><td>No</td><td>Yes (KDC)</td><td>Yes</td><td>No (key-derived, once)</td></tr>
+<tr><td>PKI / Certificate-based</td><td>No</td><td>Yes</td><td>Depends</td><td>Yes</td><td>Never</td></tr>
+</table>
+<h3><span class="num">5.</span> Key Takeaways</h3>
+<table class="data">
+<tr><th>•</th><th>Authentication on a network is fundamentally harder than local login because the workstation can't be trusted and the network can't be trusted.</th></tr>
+<tr><td>•</td><td>Kerberos solves this by moving trust to a centralized, cryptographically secured authority (the KDC).</td></tr>
+<tr><td>•</td><td>The ticket system means the password is used once to unlock a session, then discarded — all subsequent authentication uses time-bound encrypted tickets.</td></tr>
+<tr><td>•</td><td>Mutual authentication means both parties verify each other — not just the client proving itself to the server.</td></tr>
+<tr><td>•</td><td>The timestamp mechanism is Kerberos's primary defense against replay attacks — a captured ticket is only valid within a narrow time window.</td></tr>
+</table>
+
+<div class="mcq-zone"></div>
+<div class="exhibit">
+  <div class="corner-bl"></div><div class="corner-br"></div>
+  <div class="exhibit-label">
+    <span>DIAGRAM SPACE</span>
+  </div>
+  <div class="exhibit-zone has-image" data-topic="kerberos">
+    <img src="temp.img" alt="Diagram">
+  </div>
+  <div class="exhibit-actions" style="display:flex;">
+    <button class="exhibit-replace">Replace</button>
+    <button class="exhibit-remove danger">Remove</button>
+  </div>
+  <input type="file" class="exhibit-file" accept="image/*" style="display:none;">
+</div>
+<div class="topic-footer">
+  <button class="nav-btn prev" data-nav="prev"><span class="nb-label">PREV CASE</span><span class="nb-title">--</span></button>
+  <button class="nav-btn next" data-nav="next"><span class="nb-label">NEXT CASE</span><span class="nb-title">--</span></button>
+</div>
+<label class="mark-reviewed">
+  <input type="checkbox" class="reviewed-checkbox" data-topic="kerberos">
+  I have mastered this case file
+</label>
+        
+      </section>
+
+      <section class="topic" id="msg-auth" data-title="Message Authentication">
+        <div class="topic-head">
+  <div class="topic-eyebrow">
+    <span class="file-no">FILE 08</span>
+    <span class="deck-tag">INFOSEC DOSSIER</span>
+  </div>
+  <h2 class="topic-title">Message Authentication</h2>
+  <div class="topic-brief">Notes</div>
+  <div class="file-attachment">
+    <span class="file-type-badge ppt">PPT</span>
+    <a href="file Message Authentication.ppt" target="_blank" class="file-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      file Message Authentication.ppt
+    </a>
+  </div>
+</div>
+<h3><span class="num">1.</span> Why Do We Need Message Authentication?</h3>
+<p>Think about any system where two parties exchange data over a network: online banking, software updates, military communications, even a simple email. The channel they're using (the internet) is not trustworthy — anyone in between could intercept a message and quietly change it before it arrives.</p>
+<p>Message authentication is the set of techniques used to make sure that doesn't happen undetected. It answers one specific question for the receiver:</p>
+<p>"Is this message exactly what the sender sent, with nothing added, removed, changed, or replayed from an earlier session?"</p>
+<p>Note that this is a different question from "is this message secret?" Encryption hides content; authentication checks integrity and origin. You can have one without the other — a message can be fully encrypted and unreadable to an attacker, yet still be authenticated incorrectly if a system isn't designed carefully, and likewise a message can travel in plaintext but still come with a guarantee that it hasn't been tampered with.</p>
+<p>This matters most in situations where an undetected change could cause real damage — e.g., a tampered funds-transfer instruction, a forged command in a control system, or a maliciously altered software update.</p>
+<p>So formally: message authentication assures that data received are exactly as sent — no modification, no insertion, no deletion, and no replay (an old, legitimate message being resent later to fool the system).</p>
+<h3><span class="num">2.</span> Three Ways to Build an "Authenticator"</h3>
+<p>To prove a message hasn't been altered, the sender attaches some extra piece of evidence — an authenticator — that the receiver can check. There are three classic approaches to generating this evidence. They differ mainly in what gets used to produce the authenticator and whether secrecy is involved.</p>
+<p>a) Message Encryption</p>
+<p>Here, the encrypted message itself is the proof of authenticity. The idea: if a message decrypts into something sensible using a shared secret key, it's reasonable to assume only someone holding that key could have produced it. So encryption is doing double duty — hiding the content and implicitly authenticating it (assuming the cipher and key management are sound). The "authenticator" isn't a separate value; it's baked into the ciphertext.</p>
+<p>b) Message Authentication Code (MAC)</p>
+<p>A MAC takes the message and a secret key, and compresses them into a small, fixed-size tag. This tag is sent alongside the (possibly plaintext) message. The receiver, who shares the same secret key, recomputes the MAC over the received message and checks whether it matches the one that arrived.</p>
+<p>The key insight: the message itself doesn't need to be encrypted at all for this to work — confidentiality and authentication are separated. The secret key is what prevents a forger from generating a valid tag for a message they made up, since they don't know the key.</p>
+<p>c) Hash Function</p>
+<p>A hash function is a public, keyless function that turns any input — short or extremely long — into a small fixed-size output. No secret key is involved in computing it. By itself, a hash only proves "the data matches this fingerprint" — it doesn't prove who produced the data, because anyone can compute a hash of anything. To get real authentication out of a hash, it has to be combined with something else that brings in secrecy (e.g., sending the hash through an encrypted channel, or combining it with a secret key — which is essentially how MACs and HMAC are built).</p>
+<p>Quick mental model:</p>
+<table class="data">
+<tr><th>Approach</th><th>Needs a secret key to compute?</th><th>Provides confidentiality?</th><th>What's actually sent</th></tr>
+<tr><td>Message Encryption</td><td>Yes</td><td>Yes</td><td>Ciphertext only</td></tr>
+<tr><td>MAC</td><td>Yes</td><td>No (by itself)</td><td>Message + MAC tag</td></tr>
+<tr><td>Hash Function</td><td>No</td><td>No</td><td>Message + hash value</td></tr>
+</table>
+<h3><span class="num">3.</span> Hash Functions — A Closer Look</h3>
+<p>A hash function H takes an input message m of any length and produces a fixed-size output h, written as:</p>
+<p>h = H(m)</p>
+<p>That output h is called the hash value. The whole point is compression: no matter whether m is one sentence or a 10 GB file, H(m) is always the same fixed number of bits.</p>
+<p>This single property — "map anything to a fixed-size fingerprint" — is useful far beyond security. It's the basis of hash tables in programming, checksums for detecting accidental file corruption, and so on. But to be useful specifically for security, a hash function needs to satisfy some much stricter conditions — which is why cryptographic hash functions are a special, carefully designed category.</p>
+<p>Requirements for a Cryptographic Hash Function</p>
+<p>For a hash function to be trustworthy enough to use in security, it must satisfy:</p>
+<h3><span class="num">1.</span> Variable input length — it has to accept input of any size, not just a fixed block.</h3>
+<h3><span class="num">2.</span> Fixed output length — the result is always the same size, regardless of input size (this keeps storage/comparison efficient and predictable).</h3>
+<h3><span class="num">3.</span> Easy to compute — for any given input x, calculating H(x) should be fast and computationally cheap. (If it weren't, nobody could use it in practice.)</h3>
+<h3><span class="num">4.</span> One-way (preimage resistant) — going forward (input → hash) is easy, but going backward must be practically impossible.</h3>
+<h3><span class="num">5.</span> Collision-free (collision resistant) — it should be infeasible to find two different inputs that produce the same hash output.</h3>
+<p>Properties 4 and 5 are really the heart of what separates a cryptographic hash from an ordinary one — they're what stop an attacker from forging data that "looks the same" to the hash function.</p>
+<p>Understanding "One-Way" More Precisely</p>
+<p>Calling H "one-way" means: given only the output h, it is computationally infeasible to find any input x such that H(x) = h. In other words, you can easily go from message → fingerprint, but you cannot reverse-engineer a fingerprint back into the original message (or even into some message that produces it).</p>
+<p>Why this matters: if hashes could be inverted, an attacker could take an intercepted hash value and reconstruct a message that produces it — defeating the whole purpose of using the hash as a tamper-check.</p>
+<p>Why "Collision-Free" Matters</p>
+<p>If an attacker could find two different messages that hash to the same value, they could swap a legitimate message for a fraudulent one without changing the hash — and the receiver's check would never catch it. So collision resistance is what keeps the hash trustworthy as a "fingerprint": no two different documents should plausibly share one.</p>
+<h3><span class="num">4.</span> Hash Functions as "Message Digests"</h3>
+<p>Because a hash value is so much smaller than the original message but still derived from every bit of it, it's often called a message digest — a condensed, representative summary of the original data.</p>
+<p>A helpful analogy: think of the hash value as a digital fingerprint. Just as a human fingerprint is small but uniquely tied to one specific person, a message digest is small but (ideally) uniquely tied to one specific message. Change even a single bit of the original message, and the resulting hash should look completely different and unpredictable.</p>
+<p>Well-known examples of such hash functions include MD5 and SHA (Secure Hash Algorithm) — families of algorithms designed specifically to meet the cryptographic requirements above. (Note: MD5 and SHA-1 are now considered cryptographically broken/weak by modern standards, which is exactly why the collision-resistance requirement matters so much — when collisions become findable, the scheme fails.)</p>
+<h3><span class="num">5.</span> How a Hash Function Is Actually Used for Authentication</h3>
+<p>Putting the pieces together, here's the process in practice:</p>
+<h3><span class="num">1.</span> Sender's side: The sender computes a hash value from the bits of the message: h = H(m). They then transmit both the original message m and the hash value h.</h3>
+<h3><span class="num">2.</span> Receiver's side: The receiver takes the message they received and runs the same hash function on it themselves, getting their own hash value.</h3>
+<h3><span class="num">3.</span> Comparison: The receiver compares their freshly computed hash to the hash value that was sent along with the message.</h3>
+<table class="data">
+<tr><th>o</th><th>Match → the message arrived intact (assuming the hash value itself wasn't also tampered with — which is why, in real systems, the hash is usually protected separately, e.g. encrypted or sent via a secure channel, rather than sent as bare plaintext alongside the message).</th></tr>
+<tr><td>o</td><td>Mismatch → something changed — either the message, the hash, or both — and the receiver knows not to trust it.</td></tr>
+</table>
+<p>This is the conceptual foundation for many real-world integrity mechanisms (digital signatures, HMAC, software checksums, etc.) — they all build on this same basic "compute, send, recompute, compare" pattern, just adding secret keys or asymmetric cryptography on top to also nail down who sent it.</p>
+<p>Summary Diagram (Conceptual)</p>
+<p>SENDER                              RECEIVER</p>
+<p>message (m)                         message (m) received</p>
+<p>|                                      |</p>
+<p>v                                      v</p>
+<p>h = H(m)  -----------+            h' = H(m) [recomputed]</p>
+<p>|                 |                    |</p>
+<p>v                 v                    v</p>
+<p>send m and h ---->  arrives  ---->   compare h with h'</p>
+<p>|</p>
+<p>match -> message is intact</p>
+<p>mismatch -> message was altered</p>
+
+<div class="mcq-zone"></div>
+<div class="exhibit">
+  <div class="corner-bl"></div><div class="corner-br"></div>
+  <div class="exhibit-label">
+    <span>DIAGRAM SPACE</span>
+  </div>
+  <div class="exhibit-zone has-image" data-topic="msg-auth">
+    <img src="macvsmdc.png" alt="Diagram" style="margin-bottom: 10px;">
+    <img src="message auth.png" alt="Diagram">
+  </div>
+  <div class="exhibit-actions" style="display:flex;">
+    <button class="exhibit-replace">Replace</button>
+    <button class="exhibit-remove danger">Remove</button>
+  </div>
+  <input type="file" class="exhibit-file" accept="image/*" style="display:none;">
+</div>
+<div class="topic-footer">
+  <button class="nav-btn prev" data-nav="prev"><span class="nb-label">PREV CASE</span><span class="nb-title">--</span></button>
+  <button class="nav-btn next" data-nav="next"><span class="nb-label">NEXT CASE</span><span class="nb-title">--</span></button>
+</div>
+<label class="mark-reviewed">
+  <input type="checkbox" class="reviewed-checkbox" data-topic="msg-auth">
+  I have mastered this case file
+</label>
+        
+      </section>
+
+      <section class="topic" id="digital-sig" data-title="Digital Signatures">
+        <div class="topic-head">
+  <div class="topic-eyebrow">
+    <span class="file-no">FILE 09</span>
+    <span class="deck-tag">INFOSEC DOSSIER</span>
+  </div>
+  <h2 class="topic-title">Digital Signatures</h2>
+  <div class="topic-brief">Notes</div>
+  <div class="file-attachment">
+    <span class="file-type-badge ppt">PPT</span>
+    <a href="file Digital Signature.ppt" target="_blank" class="file-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      file Digital Signature.ppt
+    </a>
+  </div>
+</div>
+<h3><span class="num">1.</span> What Is a Digital Signature, Really?</h3>
+<p>Forget the cryptography for a second and think about why ordinary, handwritten signatures work at all. When you sign a paper contract, the signature does two things: it shows that you (specifically) agreed to it, and it makes it awkward for you to later claim you didn't. A digital signature tries to do the same job for electronic data — but because anyone can copy a string of bits perfectly, "copying someone's signature" digitally would be trivial unless the scheme is built very carefully.</p>
+<p>So a digital signature is best understood as a small piece of data, mathematically tied to both a specific message and a specific person's secret key, that lets anyone holding the person's public key verify two things at once: "this exact message" and "this exact signer."</p>
+<p>A simple everyday example: when you make an online purchase, your browser/payment system effectively "signs" the transaction so that only someone with your private credentials could have authorized that specific purchase — preventing someone else from forging a transaction in your name.</p>
+<h3><span class="num">2.</span> The Three Jobs a Digital Signature Does</h3>
+<p>A digital signature isn't just "proof of integrity" — it's actually solving three separate problems simultaneously, and it's worth treating them as distinct, because each one fails in a different way if the scheme is broken.</p>
+<p>a) Authentication</p>
+<p>The receiver can be confident the message really did originate from the claimed sender — not from an impersonator. This works because only the real sender has access to the private key needed to produce a valid signature.</p>
+<p>b) Integrity</p>
+<p>The receiver can be confident the message wasn't altered after it was signed. Because the signature is mathematically derived from the message's exact contents (via a hash, as we'll see), changing even one bit of the message after signing will cause the signature to no longer match.</p>
+<p>c) Non-repudiation</p>
+<p>This is the one ordinary checksums and even MACs (from message authentication) don't give you. With a digital signature, the signer cannot later deny having signed it — because producing a valid signature requires a private key that only they possess. Contrast this with a shared-secret MAC: if Alice and Bob share a secret key, Alice can't prove to a third party that a MAC-tagged message came from Bob and not from herself, since she could have produced the same tag. A digital signature avoids this problem because the "secret" used to produce it belongs to one person alone, and a separate public counterpart lets everyone else verify without ever needing that secret.</p>
+<p>Why this distinction matters in practice: authentication and integrity alone are about trust between sender and receiver. Non-repudiation is about trust in front of a third party — a judge, an auditor, an arbitrator — which is exactly why digital signatures (not MACs) underpin things like legally binding e-contracts and financial transaction authorization.</p>
+<h3><span class="num">3.</span> What Makes a Valid Digital Signature Scheme</h3>
+<p>For a signature scheme to actually be trustworthy, it has to satisfy a handful of properties. Notice how these requirements map directly onto preventing specific kinds of attacks:</p>
+<h3><span class="num">1.</span> The signature must depend on the message being signed. If the same signature value could be reused for any message, it wouldn't be proving anything about this particular message — it would just be a generic stamp. This is what stops "replay" style attacks where an old valid signature gets attached to a new, different message.</h3>
+<h3><span class="num">2.</span> The signature must use information unique to the sender. This is what makes forgery and denial both impossible — unique here specifically means secret and exclusive, i.e., the sender's private key, which no one else has.</h3>
+<h3><span class="num">3.</span> It must be easy to produce. The legitimate signer needs to be able to generate a signature quickly and cheaply using their private key — otherwise the scheme is impractical for real use.</h3>
+<h3><span class="num">4.</span> It must be easy to verify. Anyone with the signer's public key should be able to check the signature's validity without needing special access or heavy computation.</h3>
+<h3><span class="num">5.</span> It must be computationally infeasible to forge. Without the private key, it should be practically impossible for anyone — including someone who has seen many prior valid signatures — to construct a new valid signature.</h3>
+<p>Notice the asymmetry being engineered here on purpose: easy to do if you hold the secret, essentially impossible to do if you don't. That asymmetry is the entire security guarantee.</p>
+<h3><span class="num">4.</span> The Underlying Idea: Encrypt with Private, Decrypt with Public</h3>
+<p>This is the conceptual trick that makes digital signatures possible, and it's the reverse of how public-key encryption for confidentiality normally works.</p>
+<p>For confidentiality (keeping a message secret): you encrypt with the recipient's public key, and only the recipient (holding the matching private key) can decrypt it. Anyone can encrypt; only one person can decrypt.</p>
+<p>For a digital signature (proving authorship): you flip it. The sender encrypts with their own private key. Now anyone holding the sender's public key can decrypt it — so this isn't secret at all. But that's not the point here. The point is: since only the sender possesses that private key, only the sender could have produced something that decrypts correctly with the corresponding public key. The "decryption" step isn't being used to hide information from anyone — it's being used as a verification test that only passes if the right private key was used to create it.</p>
+<p>This is the goal in one line: guarantee that a message must have originated from one specific entity, by exploiting the fact that the private/public key pair is mathematically linked, and only one half of that pair is ever secret.</p>
+<h3><span class="num">5.</span> Why Sign a Hash Instead of the Whole Message</h3>
+<p>You could imagine signing by encrypting the entire message with your private key. It would technically work, but it's hugely wasteful: public-key cryptography is computationally expensive, and messages can be enormous (think gigabyte files), while the actual mathematical operations behind RSA or similar schemes are slow per byte.</p>
+<p>The fix: use a one-way hash function (covered in message authentication) to compress the message down into a small, fixed-size digest first, and sign that instead. Since hash functions are designed so that even a tiny change to the message produces a completely different digest, signing the digest is just as good as signing the whole message for proving integrity — but it's vastly faster, because you're now doing the expensive private-key operation on a small fixed-size value instead of an arbitrarily large message.</p>
+<h3><span class="num">6.</span> The Full Process, Step by Step (Joe Sending to Alice)</h3>
+<p>Let's walk through a concrete example with Joe sending a signed message to Alice. The diagram above shows this whole pipeline visually — here's what each step is actually accomplishing:</p>
+<h3><span class="num">1.</span> Joe hashes the message. He runs a one-way hash function over the message contents, producing a fixed-length message digest. This digest is a compact "fingerprint" of his exact message.</h3>
+<h3><span class="num">2.</span> Joe encrypts the digest with his private key. This encrypted digest is the digital signature. Critically, nobody else could have produced this specific encrypted value, because nobody else has Joe's private key.</h3>
+<h3><span class="num">3.</span> Joe sends both the signature and the original message to Alice. Note that the message itself doesn't need to be encrypted at all for signing purposes — signing is about authentication and integrity, not secrecy. (If Joe also wants the message kept confidential, that's a separate, additional step — see Section 8.)</h3>
+<h3><span class="num">4.</span> Alice decrypts the signature using Joe's public key. Since the signature was created with Joe's private key, decrypting with his matching public key reveals the original digest Joe computed. If this decryption produces something sensible (a properly-formed digest), it's strong evidence the signature really was made with Joe's private key.</h3>
+<h3><span class="num">5.</span> Alice independently hashes the message she received, using the same hash function Joe used. This gives her her own freshly computed digest, based purely on what actually arrived — regardless of whether it matches what Joe originally sent.</h3>
+<h3><span class="num">6.</span> Alice compares her freshly computed digest against the digest she recovered from the signature.</h3>
+<table class="data">
+<tr><th>o</th><th>If they match, this proves two things simultaneously: the message wasn't altered in transit (integrity), and it really was signed by Joe's private key (authentication) — and since only Joe has that private key, he can't later deny having signed it (non-repudiation).</th></tr>
+<tr><td>o</td><td>If they don't match, either the message was tampered with after Joe signed it, or the signature wasn't actually produced by Joe's key — either way, Alice knows not to trust it.</td></tr>
+</table>
+<h3><span class="num">7.</span> Why This Counts as "The Essence" of Digital Signatures</h3>
+<p>The key conceptual moment in this whole scheme is step 2: encrypting the hash code with the sender's private key. This single operation accomplishes both authentication and signing simultaneously, because:</p>
+<table class="data">
+<tr><th>•</th><th>It's an authentication mechanism: it confirms the message digest came from whoever holds the private key.</th></tr>
+<tr><td>•</td><td>It is the signature itself: the encrypted hash code is precisely the artifact that only the legitimate sender could have generated, and that's exactly the property a signature needs to have.</td></tr>
+</table>
+<p>This is worth sitting with, because it explains why textbooks describe this single step as "the essence" of the technique — everything else around it (hashing first, sending the message along, decrypting at the other end) is supporting infrastructure. The actual "signing" act is just: take a small derived value, encrypt it with a secret only you hold.</p>
+<h3><span class="num">8.</span> Adding Confidentiality on Top (Optional)</h3>
+<p>Signing alone does not keep the message secret — anyone intercepting the transmission can read the plaintext message, because the signature only proves authorship and integrity, not secrecy. Often that's fine (you don't always need a signed document to be secret). But if you want both properties — confidentiality and a digital signature — there's a common technique:</p>
+<p>Take the message plus its private-key-encrypted hash code (i.e., the message plus its signature, as already constructed above), and encrypt that entire bundle using a symmetric secret key (a separate, typically faster encryption scheme like AES).</p>
+<p>Why structure it this way rather than some other order?</p>
+<table class="data">
+<tr><th>•</th><th>Efficiency: symmetric encryption is fast and well-suited to encrypting bulk data (the whole message), while public-key operations stay limited to just the small hash value — keeping the expensive asymmetric math to a minimum, exactly as in Section 5.</th></tr>
+<tr><td>•</td><td>Layering of guarantees: the inner private-key-encrypted hash still does its job of authentication and signing; the outer symmetric encryption adds a separate, independent layer of confidentiality. Anyone without the symmetric key can't even read the message to begin with, and even if they somehow obtained the message, they still couldn't forge a new valid signature for it without Joe's private key.</td></tr>
+</table>
+<p>This two-layer structure — sign first, then optionally encrypt the whole package — is a common and practical pattern in real security protocols.</p>
+<p>Quick Recap Table</p>
+<table class="data">
+<tr><th>Property</th><th>What it protects against</th><th>How it's achieved</th></tr>
+<tr><td>Authentication</td><td>Impersonation</td><td>Only the real sender has the private key</td></tr>
+<tr><td>Integrity</td><td>Tampering in transit</td><td>Hash digest changes if message changes</td></tr>
+<tr><td>Non-repudiation</td><td>Sender denying they sent it</td><td>Signature requires a key only the sender owns</td></tr>
+<tr><td>(Optional) Confidentiality</td><td>Eavesdropping</td><td>Additional symmetric encryption layer over message + signature</td></tr>
+</table>
+
+<div class="mcq-zone"></div>
+<div class="exhibit">
+  <div class="corner-bl"></div><div class="corner-br"></div>
+  <div class="exhibit-label">
+    <span>DIAGRAM SPACE</span>
+  </div>
+  <div class="exhibit-zone has-image" data-topic="digital-sig">
+    <img src="digitalsign.png" alt="Diagram">
+  </div>
+  <div class="exhibit-actions" style="display:flex;">
+    <button class="exhibit-replace">Replace</button>
+    <button class="exhibit-remove danger">Remove</button>
+  </div>
+  <input type="file" class="exhibit-file" accept="image/*" style="display:none;">
+</div>
+<div class="topic-footer">
+  <button class="nav-btn prev" data-nav="prev"><span class="nb-label">PREV CASE</span><span class="nb-title">--</span></button>
+  <button class="nav-btn next" data-nav="next"><span class="nb-label">NEXT CASE</span><span class="nb-title">--</span></button>
+</div>
+<label class="mark-reviewed">
+  <input type="checkbox" class="reviewed-checkbox" data-topic="digital-sig">
+  I have mastered this case file
+</label>
+        
+      </section>
+
+      <section class="topic" id="cloud-threats" data-title="Cloud Computing &amp; Common Cyber Threats">
+        <div class="topic-head">
+  <div class="topic-eyebrow">
+    <span class="file-no">FILE 10</span>
+    <span class="deck-tag">INFOSEC DOSSIER</span>
+  </div>
+  <h2 class="topic-title">Cloud Computing & Common Cyber Threats</h2>
+  <div class="topic-brief">Notes</div>
+  <div class="file-attachment">
+    <span class="file-type-badge pdf">PDF</span>
+    <a href="file cloud and cyberthreats.pdf" target="_blank" class="file-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      file cloud and cyberthreats.pdf
+    </a>
+  </div>
+</div>
+<h3><span class="num">1.</span> On-Premises vs. Cloud</h3>
+<p>On-Premises</p>
+<p>This simply means the organization owns and runs everything itself. The software, servers, and data physically sit inside a location the company controls — typically its own data center.</p>
+<p>The trade-off is responsibility: the company's IT staff get full physical access and full control over configuration, but they also inherit all the work of managing and securing that infrastructure — power, cooling, hardware failures, patching, physical security, all of it.</p>
+<p>Cloud</p>
+<p>Cloud computing flips that arrangement. Instead of owning the hardware, you rent capacity from a vendor (e.g., Microsoft Azure) and access it over the internet. The vendor — not you — takes on responsibility for managing and securing the underlying servers.</p>
+<p>The appeal is usually cost: no need to buy, power, cool, or maintain physical machines yourself. The trade-off is trust and control — you're relying on a third party to secure your infrastructure, which is exactly why security concerns are often cited as the main reason some organizations hesitate to move to the cloud.</p>
+<p>The core tension in one line: on-prem trades convenience for control; cloud trades control for convenience. Neither is "more secure" by default — it depends on who's doing the securing and how well.</p>
+<h3><span class="num">2.</span> Malware — The Umbrella Term</h3>
+<p>Malware ("malicious software") is the catch-all term for any program, file, or code designed to harm a system, steal information, or give an attacker unauthorized capabilities. It's an umbrella category — viruses, worms, trojans, ransomware, spyware, rootkits, adware, scareware, botnets, logic bombs, and keyloggers are all types of malware, not separate things from it.</p>
+<p>Understanding malware well means understanding what makes each type distinct — usually based on how it spreads and what it's trying to achieve. That's the lens to use for each one below.</p>
+<table class="data">
+<tr><th>Type</th><th>How it spreads</th><th>What it's trying to do</th></tr>
+<tr><td>Virus</td><td>Attaches to an executable; needs a human to run it</td><td>Damage/destroy data or system</td></tr>
+<tr><td>Worm</td><td>Spreads on its own across a network, no human needed</td><td>Consume bandwidth, corrupt OS files</td></tr>
+<tr><td>Trojan</td><td>Disguised as something legitimate</td><td>Hide a malicious payload (backdoor, theft, etc.)</td></tr>
+<tr><td>Ransomware</td><td>Spreads like a worm</td><td>Encrypt files, extort payment for the key</td></tr>
+<tr><td>Spyware</td><td>Bundled with downloaded freeware</td><td>Secretly monitor and steal user data</td></tr>
+<tr><td>Rootkit</td><td>Hides deep in the system</td><td>Grant attacker admin-level (root) access, undetected</td></tr>
+<tr><td>Keylogger</td><td>Installed software/hardware</td><td>Record every keystroke (passwords, card numbers)</td></tr>
+<tr><td>Adware</td><td>Bundled with installed software</td><td>Force ads to generate revenue</td></tr>
+<tr><td>Scareware</td><td>Pop-ups mimicking system alerts</td><td>Trick user into buying fake "fix" software</td></tr>
+<tr><td>Logic bomb</td><td>Hidden inside other software</td><td>Triggers malicious action on a specific event/date</td></tr>
+<tr><td>Botnet</td><td>Spread via trojans</td><td>Remotely control many infected machines at once</td></tr>
+</table>
+<p>Network defenders detect malware using tools like packet capture analysis, Snort, NetFlow, IPS systems, and Cisco's Advanced Malware Protection / FirePOWER — essentially, anything that watches network traffic for suspicious patterns.</p>
+<p>A Closer Look at a Few Worth Understanding Individually</p>
+<p>Virus vs. Worm — the key distinction is autonomy. A virus is essentially dormant until a person (or another program) triggers it by opening an infected file. A worm needs none of that — it actively replicates and spreads across a network on its own, which is why worms can cause damage far faster and more widely than viruses.</p>
+<p>Trojan — the defining trait is disguise, not damage mechanism. A trojan can deliver almost any payload (a backdoor, ransomware, a DoS tool) — what makes it a "trojan" specifically is that it pretends to be something harmless or useful so the victim installs it willingly. Trojans commonly spread through unmonitored channels like P2P file-sharing, instant messaging, email attachments, and browser extensions.</p>
+<p>Ransomware — the business model matters as much as the mechanism. It encrypts the victim's files (sometimes even the master boot record) and demands payment for the decryption key. Notable examples include CryptoLocker, CryptoWall, and the 2017 WannaCry outbreak, which caused widespread global damage.</p>
+<p>Rootkit — the name is literally descriptive. "Root" = the administrator account on Unix/Linux systems; "kit" = a set of tools. So a rootkit is, by definition, a toolkit for quietly obtaining and keeping root-level access — and its defining feature is that it works in the background specifically to avoid detection.</p>
+<p>Botnet — think of it as malware's "management layer." Attackers can't manually control thousands of infected machines one at a time, so they use a botnet (bot = robot, net = network) to issue commands to all infected machines ("zombies") at once — most commonly to launch large coordinated attacks like DDoS.</p>
+<h3><span class="num">3.</span> Network and Application-Level Attacks</h3>
+<p>These differ from malware in an important way: malware is software placed on a victim's system, while the attacks below are techniques — often exploiting how networks or applications are designed, sometimes without installing anything at all.</p>
+<p>Denial of Service (DoS) / Distributed Denial of Service (DDoS)</p>
+<p>The goal is simple: overwhelm a server with so many requests that it can't serve legitimate users — effectively taking it offline. DoS comes from one source; DDoS comes from many sources at once (often a botnet), making it much harder to block since traffic isn't coming from a single identifiable origin. Common techniques include Ping of Death, Smurf attacks, TCP SYN floods, and ICMP floods. Cloud environments are particularly attractive DDoS targets because their infrastructure is shared across many users — congestion can affect everyone on that shared resource.</p>
+<p>SQL Injection</p>
+<p>Web applications often build database queries using input typed by users (like a login form). SQL injection exploits that by sneaking malicious SQL code into that input, tricking the application into running commands the developer never intended — letting an attacker read, modify, or delete data they should never have access to.</p>
+<p>Cross-Site Scripting (XSS)</p>
+<p>Similar idea, different target: instead of attacking the database, XSS injects malicious script into a web page that other users' browsers will execute. A common goal is stealing session cookies or login tokens — effectively letting the attacker impersonate a logged-in user. The three main types are reflected, stored (persistent), and DOM-based XSS, which differ mainly in where the malicious script gets stored and triggered.</p>
+<p>Phishing</p>
+<p>This is a social engineering attack — meaning it targets human judgment rather than a technical flaw. The attacker crafts an email or website that looks like it's from a trusted source, aiming to trick the victim into handing over credentials or clicking a malicious link/attachment.</p>
+<p>Man-in-the-Middle (MITM)</p>
+<p>The attacker secretly positions themselves between two communicating parties (e.g., a user and an app) and intercepts — or even alters — the traffic passing between them, often to steal credentials or financial data, without either side realizing the conversation has a third party listening in.</p>
+<p>Data Breach</p>
+<p>This is less a specific technique and more an outcome — sensitive data (financial records, health info, trade secrets, personal data) ends up exposed when it shouldn't be. It commonly stems from poor identity and access management — i.e., not properly restricting who can reach what data based on their actual job role. This is why measures like two-factor authentication (e.g., one-time passwords or phone-based verification) matter: they raise the cost of stealing credentials even if a password alone gets compromised.</p>
+<h3><span class="num">4.</span> APIs — Why They Matter for Cloud Security</h3>
+<p>An API (Application Programming Interface) is the defined way two pieces of software talk to each other — a set of rules describing what requests are allowed and what responses to expect.</p>
+<p>The restaurant analogy is genuinely useful here: think of an API as a waiter. You (the customer/app) don't walk into the kitchen (the server) yourself — you give your order (a request) to the waiter (the API), who relays it to the kitchen and brings back your food (the response). The waiter is the only sanctioned channel between you and the kitchen.</p>
+<p>This analogy also explains why APIs are a security concern: the waiter is a trusted intermediary with access to the kitchen. If someone can trick or bypass the waiter, they get access to the kitchen without ever needing to walk in through the front door themselves.</p>
+<p>In cloud computing specifically, APIs are how customers manage, configure, and pull data from cloud services — and increasingly, how mobile apps and backend services authenticate users and exchange data (commonly using XML or JSON as the data format). This makes APIs a kind of public front door to cloud applications. If an API is poorly secured or misconfigured, an attacker can exploit it to gain broad access — to modify or delete data, or reach resources that were supposed to be locked down — without ever breaching the "main" application directly.</p>
+<p>Quick Recap</p>
+<table class="data">
+<tr><th>•</th><th>On-prem vs. cloud is a trade-off between control and convenience — not a simple "more secure / less secure" choice.</th></tr>
+<tr><td>•</td><td>Malware is the umbrella term; each subtype is best understood by how it spreads and what it's trying to achieve.</td></tr>
+<tr><td>•</td><td>Network/application attacks (DoS, SQLi, XSS, phishing, MITM, data breaches) exploit design weaknesses or human trust, not necessarily installed malicious code.</td></tr>
+<tr><td>•</td><td>APIs are a powerful, necessary convenience in cloud systems — and exactly because they're a trusted gateway, they're also a high-value target if left poorly secured.</td></tr>
+</table>
+
+<div class="mcq-zone"></div>
+<div class="exhibit">
+  <div class="corner-bl"></div><div class="corner-br"></div>
+  <div class="exhibit-label">
+    <span>DIAGRAM SPACE</span>
+  </div>
+  <div class="exhibit-zone has-image" data-topic="cloud-threats">
+    <img src="temp.img" alt="Diagram">
+  </div>
+  <div class="exhibit-actions" style="display:flex;">
+    <button class="exhibit-replace">Replace</button>
+    <button class="exhibit-remove danger">Remove</button>
+  </div>
+  <input type="file" class="exhibit-file" accept="image/*" style="display:none;">
+</div>
+<div class="topic-footer">
+  <button class="nav-btn prev" data-nav="prev"><span class="nb-label">PREV CASE</span><span class="nb-title">--</span></button>
+  <button class="nav-btn next" data-nav="next"><span class="nb-label">NEXT CASE</span><span class="nb-title">--</span></button>
+</div>
+<label class="mark-reviewed">
+  <input type="checkbox" class="reviewed-checkbox" data-topic="cloud-threats">
+  I have mastered this case file
+</label>
+        
+      </section>
+
+      <section class="topic" id="key-exchange" data-title="Key Exchange &amp; MAC vs MDC">
+        <div class="topic-head">
+  <div class="topic-eyebrow">
+    <span class="file-no">FILE 11</span>
+    <span class="deck-tag">INFOSEC DOSSIER</span>
+  </div>
+  <h2 class="topic-title">Key Exchange & MAC vs MDC</h2>
+  <div class="topic-brief">Quick Notes</div>
+</div>
+<p>Symmetric Key Exchange</p>
+<p>Both sides use the same single key to encrypt and decrypt. Fast and efficient — great for bulk data — but the catch is getting that one key safely to both parties in the first place. If an attacker intercepts the key in transit, the whole scheme is broken, since that one key does everything.</p>
+<p>This is called the key distribution problem: you need a secure channel to share the key, but if you already had a secure channel, you might not need the key at all. Solutions like Diffie-Hellman exist specifically to let two parties agree on a shared secret over an insecure channel without ever transmitting the key itself.</p>
+<table class="data">
+<tr><th>•</th><th>One key, shared by both sides</th></tr>
+<tr><td>•</td><td>Fast, used for actual data encryption (AES, DES, etc.)</td></tr>
+<tr><td>•</td><td>Hard part: distributing the key safely</td></tr>
+<tr><td>•</td><td>Doesn't scale well — every pair of users needs their own shared key</td></tr>
+</table>
+<p>Asymmetric Key Exchange</p>
+<p>Each party has a key pair: a public key (shared openly) and a private key (kept secret, never transmitted). Anything encrypted with one half can only be decrypted with the other half.</p>
+<p>This sidesteps the distribution problem entirely — you never need to secretly share anything. Anyone can grab your public key and send you something only you (with your private key) can read. The trade-off is speed: asymmetric math (RSA, etc.) is much slower than symmetric encryption, so it's typically used to exchange a symmetric session key, not to encrypt the actual bulk data.</p>
+<table class="data">
+<tr><th>•</th><th>Two mathematically linked keys per person</th></tr>
+<tr><td>•</td><td>Solves the distribution problem (public key needs no secrecy)</td></tr>
+<tr><td>•</td><td>Slower — usually only used to securely hand off a symmetric key</td></tr>
+<tr><td>•</td><td>Basis of digital signatures too (private key signs, public key verifies)</td></tr>
+</table>
+<p>In practice, most real systems use both: asymmetric crypto to safely establish a shared secret, then symmetric crypto to actually encrypt the conversation. This combo is called hybrid encryption — it gets the security of asymmetric key exchange with the speed of symmetric bulk encryption.</p>
+<p>MAC vs MDC</p>
+<p>Both produce a short fixed-size value from a message, and both are meant to catch tampering — but they differ in exactly what guarantee you get, and that comes down to one thing: is a secret key involved or not.</p>
+<p>MDC (MOdification Detection Code) is just the output of a plain hash function (e.g., MD5, SHA) — no key. It's a "modification detector": recompute the hash, compare it, see if it changed. But because anyone can compute it, an attacker can tamper with the message and recompute a fresh, correct MDC for their tampered version — so on its own, an MDC can't tell you the message came from a specific, trusted sender. It only works as real protection if the MDC itself is delivered through some other secure means (e.g., sent separately over an encrypted channel).</p>
+<p>MAC (Message Authentication Code) bakes a secret key, shared only between sender and receiver, into the computation itself. An attacker without that key can't generate a valid tag for a forged message, even knowing the exact algorithm. This is what gets you actual authentication (proof of source), not just a change-detector.</p>
+<table class="data">
+<tr><th>MDC</th><th>MAC</th></tr>
+<tr><td>Needs a secret key?</td><td>No</td><td>Yes</td></tr>
+<tr><td>Detects modification?</td><td>Yes</td><td>Yes</td></tr>
+<tr><td>Proves who sent it?</td><td>No (on its own)</td><td>Yes</td></tr>
+<tr><td>Anyone can recompute it?</td><td>Yes</td><td>Only key-holders</td></tr>
+</table>
+<p>One-line takeaway: an MDC only flags that the data changed; a MAC flags that and proves it came from someone holding the shared secret — the key is what turns a tamper-detector into an authenticator.</p>
+
+<div class="mcq-zone"></div>
+<div class="exhibit">
+  <div class="corner-bl"></div><div class="corner-br"></div>
+  <div class="exhibit-label">
+    <span>DIAGRAM SPACE</span>
+  </div>
+  <div class="exhibit-zone has-image" data-topic="key-exchange">
+    <img src="keyexchange.png" alt="Diagram">
+  </div>
+  <div class="exhibit-actions" style="display:flex;">
+    <button class="exhibit-replace">Replace</button>
+    <button class="exhibit-remove danger">Remove</button>
+  </div>
+  <input type="file" class="exhibit-file" accept="image/*" style="display:none;">
+</div>
+<div class="topic-footer">
+  <button class="nav-btn prev" data-nav="prev"><span class="nb-label">PREV CASE</span><span class="nb-title">--</span></button>
+  <button class="nav-btn next" data-nav="next"><span class="nb-label">NEXT CASE</span><span class="nb-title">--</span></button>
+</div>
+<label class="mark-reviewed">
+  <input type="checkbox" class="reviewed-checkbox" data-topic="key-exchange">
+  I have mastered this case file
+</label>
+        
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<button class="back-top" id="backTop" aria-label="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+</button>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script src="mcqs.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  var TOPIC_ORDER = ["db-security","tls","ipsec","ids","firewall-vpn","auth-vuln","kerberos","msg-auth","digital-sig","cloud-threats","key-exchange"];
+  var topics = Array.prototype.slice.call(document.querySelectorAll(".topic"));
+  var tocLinks = Array.prototype.slice.call(document.querySelectorAll(".toc a[data-topic]"));
+  var sidebar = document.getElementById("sidebar");
+  var scrim = document.getElementById("scrim");
+  var contentEl = document.getElementById("content");
+  var reviewed = [];
+  var STORAGE_OK = !!(window.storage && typeof window.storage.get === "function");
+
+  /* ---------- toast ---------- */
+  function toast(msg){
+    var wrap = document.getElementById("toastWrap");
+    var t = document.createElement("div");
+    t.className = "toast";
+    t.textContent = msg;
+    wrap.appendChild(t);
+    requestAnimationFrame(function(){ t.classList.add("show"); });
+    setTimeout(function(){
+      t.classList.remove("show");
+      setTimeout(function(){ t.remove(); }, 300);
+    }, 2200);
+  }
+
+  /* ---------- storage helpers ---------- */
+  function storageGet(key){
+    if(!STORAGE_OK) return Promise.resolve(null);
+    return window.storage.get(key, false).then(function(r){ return r ? r.value : null; }).catch(function(){ return null; });
+  }
+  function storageSet(key, value){
+    if(!STORAGE_OK) return Promise.resolve(false);
+    return window.storage.set(key, value, false).then(function(r){ return !!r; }).catch(function(){ return false; });
+  }
+  function storageDelete(key){
+    if(!STORAGE_OK) return Promise.resolve(false);
+    return window.storage.delete(key, false).catch(function(){ return false; });
+  }
+
+  /* ---------- topic switching ---------- */
+  function showTopic(id, opts){
+    opts = opts || {};
+    var found = false;
+    topics.forEach(function(sec){
+      var on = sec.id === id;
+      if(on) found = true;
+      sec.classList.toggle("active", on);
+    });
+    if(!found){ id = TOPIC_ORDER[0]; topics.forEach(function(sec){ sec.classList.toggle("active", sec.id===id); }); }
+    tocLinks.forEach(function(a){ a.classList.toggle("active", a.dataset.topic === id); });
+    if(history.replaceState) history.replaceState(null, "", "#"+id);
+    if(!opts.noScroll) contentEl.scrollTo({top:0, behavior:"auto"});
+    closeSidebar();
+    storageSet("last-topic", id);
+    updateFooterButtons(id);
+  }
+
+  function updateFooterButtons(id){
+    var idx = TOPIC_ORDER.indexOf(id);
+    var prevBtns = document.querySelectorAll('[data-nav="prev"]');
+    var nextBtns = document.querySelectorAll('[data-nav="next"]');
+    prevBtns.forEach(function(btn){
+      if(idx <= 0){ btn.setAttribute("disabled","disabled"); btn.querySelector(".nb-title").textContent = "Start of dossier"; }
+      else { btn.removeAttribute("disabled"); btn.querySelector(".nb-title").textContent = titleFor(TOPIC_ORDER[idx-1]); btn.dataset.target = TOPIC_ORDER[idx-1]; }
+    });
+    nextBtns.forEach(function(btn){
+      if(idx === -1 || idx >= TOPIC_ORDER.length-1){ btn.setAttribute("disabled","disabled"); btn.querySelector(".nb-title").textContent = "End of dossier"; }
+      else { btn.removeAttribute("disabled"); btn.querySelector(".nb-title").textContent = titleFor(TOPIC_ORDER[idx+1]); btn.dataset.target = TOPIC_ORDER[idx+1]; }
+    });
+  }
+  function titleFor(id){
+    var el = document.getElementById(id);
+    return el ? el.dataset.title : id;
+  }
+
+  tocLinks.forEach(function(a){
+    a.addEventListener("click", function(e){
+      e.preventDefault();
+      showTopic(a.dataset.topic);
+    });
+  });
+
+  document.addEventListener("click", function(e){
+    var btn = e.target.closest("[data-nav]");
+    if(btn && !btn.hasAttribute("disabled")){
+      showTopic(btn.dataset.target);
+    }
+  });
+
+  /* ---------- mobile sidebar ---------- */
+  var hamburger = document.getElementById("hamburger");
+  function openSidebar(){ sidebar.classList.add("open"); scrim.classList.add("show"); hamburger.setAttribute("aria-expanded","true"); }
+  function closeSidebar(){ sidebar.classList.remove("open"); scrim.classList.remove("show"); hamburger.setAttribute("aria-expanded","false"); }
+  hamburger.addEventListener("click", function(){ sidebar.classList.contains("open") ? closeSidebar() : openSidebar(); });
+  scrim.addEventListener("click", closeSidebar);
+
+  /* ---------- back to top ---------- */
+  var backTop = document.getElementById("backTop");
+  contentEl.addEventListener("scroll", function(){
+    backTop.classList.toggle("show", contentEl.scrollTop > 400);
+  });
+  backTop.addEventListener("click", function(){ contentEl.scrollTo({top:0, behavior:"smooth"}); });
+
+  /* ---------- theme ---------- */
+  var themeToggle = document.getElementById("themeToggle");
+  function applyTheme(t){ document.documentElement.setAttribute("data-theme", t); }
+  themeToggle.addEventListener("click", function(){
+    var cur = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    applyTheme(cur);
+    storageSet("theme", cur);
+  });
+  storageGet("theme").then(function(t){ if(t) applyTheme(t); });
+
+  /* ---------- reviewed / progress ---------- */
+  function updateProgressUI(){
+    document.querySelectorAll(".tab-dot").forEach(function(dot){
+      dot.classList.toggle("done", reviewed.indexOf(dot.dataset.dot) !== -1);
+    });
+    document.querySelectorAll(".reviewed-checkbox").forEach(function(cb){
+      cb.checked = reviewed.indexOf(cb.dataset.topic) !== -1;
+    });
+    var pct = Math.round((reviewed.length / TOPIC_ORDER.length) * 100);
+    document.getElementById("progressLabel").textContent = reviewed.length + "/" + TOPIC_ORDER.length + " reviewed";
+    document.getElementById("progressFill").style.width = pct + "%";
+  }
+  function toggleReviewed(id, on){
+    var i = reviewed.indexOf(id);
+    if(on && i === -1) reviewed.push(id);
+    if(!on && i !== -1) reviewed.splice(i,1);
+    updateProgressUI();
+    storageSet("reviewed", JSON.stringify(reviewed));
+  }
+  document.addEventListener("change", function(e){
+    if(e.target.classList && e.target.classList.contains("reviewed-checkbox")){
+      toggleReviewed(e.target.dataset.topic, e.target.checked);
+      if(e.target.checked) toast("Marked " + titleFor(e.target.dataset.topic) + " as reviewed ✓");
+    }
+  });
+  document.getElementById("resetProgress").addEventListener("click", function(){
+    if(!confirm("Reset all reviewed checkmarks and remove every saved diagram from this dossier?")) return;
+    reviewed = [];
+    updateProgressUI();
+    storageSet("reviewed", JSON.stringify(reviewed));
+    document.querySelectorAll(".exhibit-zone").forEach(function(zone){
+      storageDelete("diagram-" + zone.dataset.topic);
+      resetExhibit(zone);
+    });
+    toast("Progress and diagrams reset");
+  });
+
+  /* ---------- exhibit / diagram upload ---------- */
+  function placeholderHTML(){
+    return '<div class="exhibit-placeholder">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5-4 4-2-2-5 5"/></svg>' +
+      '<span class="ph-title">temp.img — exhibit pending</span>' +
+      '<span class="ph-sub">Click or drag your own screenshot / drawing here. It replaces this placeholder and is saved to the dossier automatically.</span>' +
+      '</div>';
+  }
+  function resetExhibit(zone){
+    zone.classList.remove("has-image");
+    zone.innerHTML = placeholderHTML();
+    var actions = zone.parentElement.querySelector(".exhibit-actions");
+    if(actions) actions.style.display = "none";
+  }
+  function renderImage(zone, dataUrl){
+    zone.classList.add("has-image");
+    zone.innerHTML = '<img src="' + dataUrl + '" alt="User-added diagram">';
+    var actions = zone.parentElement.querySelector(".exhibit-actions");
+    if(actions) actions.style.display = "flex";
+  }
+  function handleFile(zone, file){
+    if(!file || !/^image\//.test(file.type)){ toast("Please drop an image file"); return; }
+    var reader = new FileReader();
+    reader.onload = function(){
+      var dataUrl = reader.result;
+      renderImage(zone, dataUrl);
+      storageSet("diagram-" + zone.dataset.topic, dataUrl).then(function(ok){
+        toast(ok ? "Diagram saved to dossier ✓" : "Shown for this session — too large to save permanently");
+      });
+    };
+    reader.readAsDataURL(file);
+  }
+  document.querySelectorAll(".exhibit-zone").forEach(function(zone){
+    var input = zone.parentElement.querySelector(".exhibit-file");
+    zone.addEventListener("click", function(e){
+      if(zone.classList.contains("has-image")) return;
+      input.click();
+    });
+    input.addEventListener("change", function(){
+      if(input.files && input.files[0]) handleFile(zone, input.files[0]);
+      input.value = "";
+    });
+    ["dragenter","dragover"].forEach(function(ev){
+      zone.addEventListener(ev, function(e){ e.preventDefault(); zone.classList.add("dragover"); });
+    });
+    ["dragleave","drop"].forEach(function(ev){
+      zone.addEventListener(ev, function(e){ e.preventDefault(); zone.classList.remove("dragover"); });
+    });
+    zone.addEventListener("drop", function(e){
+      if(e.dataTransfer.files && e.dataTransfer.files[0]) handleFile(zone, e.dataTransfer.files[0]);
+    });
+    storageGet("diagram-" + zone.dataset.topic).then(function(val){
+      if(val) renderImage(zone, val);
+    });
+  });
+  document.addEventListener("click", function(e){
+    var rm = e.target.closest(".exhibit-remove");
+    if(rm){
+      var zone = rm.closest(".exhibit").querySelector(".exhibit-zone");
+      resetExhibit(zone);
+      storageDelete("diagram-" + zone.dataset.topic);
+      toast("Diagram removed");
+    }
+    var rep = e.target.closest(".exhibit-replace");
+    if(rep){
+      rep.closest(".exhibit").querySelector(".exhibit-file").click();
+    }
+  });
+
+  /* ---------- search ---------- */
+  var searchInput = document.getElementById("searchInput");
+  var searchResults = document.getElementById("searchResults");
+  function buildIndex(){
+    return topics.map(function(t){
+      return { id:t.id, title:t.dataset.title, text:t.textContent.replace(/\s+/g," ").trim() };
+    });
+  }
+  var INDEX = buildIndex();
+  function runSearch(q){
+    q = q.trim();
+    if(q.length < 2){ searchResults.classList.remove("open"); searchResults.innerHTML=""; return; }
+    var re = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"), "i");
+    var hits = [];
+    INDEX.forEach(function(t){
+      var m = t.text.match(re);
+      if(m){
+        var idx = m.index;
+        var start = Math.max(0, idx-50);
+        var snippet = (start>0?"…":"") + t.text.slice(start, idx+q.length+60) + "…";
+        var safe = snippet.replace(/[&<>]/g, function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];});
+        var hi = safe.replace(re, function(mm){ return "<mark>"+mm+"</mark>"; });
+        hits.push({id:t.id, title:t.title, html:hi});
+      }
+    });
+    if(!hits.length){
+      searchResults.innerHTML = '<div class="empty">No matches in any case file.</div>';
+    } else {
+      searchResults.innerHTML = hits.slice(0,10).map(function(h){
+        return '<button class="sr-item" data-target="'+h.id+'"><span class="sr-tag">'+h.title+'</span><span class="sr-snippet">'+h.html+'</span></button>';
+      }).join("");
+    }
+    searchResults.classList.add("open");
+  }
+  searchInput.addEventListener("input", function(){ runSearch(searchInput.value); });
+  searchInput.addEventListener("focus", function(){ if(searchInput.value.trim().length>=2) searchResults.classList.add("open"); });
+  searchResults.addEventListener("click", function(e){
+    var item = e.target.closest(".sr-item");
+    if(item){ showTopic(item.dataset.target); searchResults.classList.remove("open"); searchInput.blur(); }
+  });
+  document.addEventListener("click", function(e){
+    if(!e.target.closest(".search-wrap")) searchResults.classList.remove("open");
+  });
+  document.addEventListener("keydown", function(e){ if(e.key === "Escape") searchResults.classList.remove("open"); });
+
+  /* ---------- init ---------- */
+  function init(){
+    storageGet("reviewed").then(function(val){
+      try{ reviewed = val ? JSON.parse(val) : []; } catch(e){ reviewed = []; }
+      updateProgressUI();
+    });
+    storageGet("last-topic").then(function(last){
+      var hash = location.hash.replace("#","");
+      var start = hash && TOPIC_ORDER.indexOf(hash) !== -1 ? hash : (last && TOPIC_ORDER.indexOf(last) !== -1 ? last : TOPIC_ORDER[0]);
+      showTopic(start, {noScroll:true});
+    });
+  }
+  init();
+
+  /* ---------- MCQs ---------- */
+  function initMCQs() {
+    if (!window.MCQ_DATA) return;
+    document.querySelectorAll(".mcq-zone").forEach(function(zone) {
+      var topicId = zone.closest(".topic").id;
+      var questions = window.MCQ_DATA[topicId];
+      if (!questions || !questions.length) return;
+      
+      var container = document.createElement("div");
+      container.className = "mcq-container";
+      
+      var header = document.createElement("div");
+      header.className = "mcq-header";
+      header.innerHTML = '<h3 class="mcq-title">Knowledge Check</h3><span class="mcq-status unattempted">Not Attempted</span>';
+      container.appendChild(header);
+      
+      var list = document.createElement("div");
+      list.className = "mcq-list";
+      
+      questions.forEach(function(q, i) {
+        var item = document.createElement("div");
+        item.className = "mcq-item";
+        var qId = "q_" + topicId + "_" + i;
+        
+        var html = '<div class="mcq-q">' + (i+1) + '. ' + q.question + '</div>';
+        q.options.forEach(function(opt, j) {
+          html += '<label class="mcq-opt" data-idx="'+j+'"><input type="radio" name="'+qId+'" value="'+j+'"> <span>' + opt + '</span></label>';
+        });
+        html += '<div class="mcq-feedback">' + q.explanation + '</div>';
+        item.innerHTML = html;
+        list.appendChild(item);
+      });
+      container.appendChild(list);
+      
+      var btn = document.createElement("button");
+      btn.className = "mcq-submit";
+      btn.textContent = "Submit Answers";
+      container.appendChild(btn);
+      
+      btn.addEventListener("click", function() {
+        var score = 0;
+        var items = list.querySelectorAll(".mcq-item");
+        var allAnswered = true;
+        
+        items.forEach(function(item) {
+          if (!item.querySelector('input:checked')) allAnswered = false;
+        });
+        
+        if (!allAnswered) {
+          toast("Please answer all questions before submitting.");
+          return;
+        }
+        
+        items.forEach(function(item, i) {
+          item.classList.add("graded");
+          var selected = item.querySelector('input:checked');
+          var selIdx = selected ? parseInt(selected.value) : -1;
+          var correctIdx = questions[i].answer;
+          
+          item.querySelectorAll('.mcq-opt').forEach(function(lbl, j) {
+            lbl.querySelector('input').disabled = true;
+            if (j === correctIdx) lbl.classList.add("correct");
+            else if (j === selIdx) lbl.classList.add("wrong");
+          });
+          
+          if (selIdx === correctIdx) score++;
+        });
+        
+        var pass = score >= (questions.length / 2);
+        var status = header.querySelector(".mcq-status");
+        status.className = "mcq-status " + (pass ? "passed" : "failed");
+        status.textContent = score + " / " + questions.length + (pass ? " - PASSED" : " - FAILED");
+        
+        if (pass) {
+          toast("Passed Knowledge Check! You can now mark this topic as reviewed.");
+        } else {
+          toast("Score is below 50%. Review the notes and try again.");
+        }
+        btn.style.display = "none";
+      });
+      
+      zone.appendChild(container);
+    });
+  }
+  setTimeout(initMCQs, 100);
+
+})();
+</script>
+</body>
+</html>
