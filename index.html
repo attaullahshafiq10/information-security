@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <style>
 /* ============================================================
    TOKENS
@@ -588,6 +589,7 @@ html[data-theme="dark"] .archive-list .ext-badge.pptx { background:#352510; colo
   <nav class="sidebar" id="sidebar" aria-label="Topic index">
     <div class="sidebar-label">Case file index</div>
     <ol class="toc" id="tocList">
+
       <li><a href="#db-security" data-topic="db-security"><span class="tab-no">01</span><span class="tab-title">Database Security</span><span class="tab-dot" data-dot="db-security">✓</span></a></li>
       <li><a href="#tls" data-topic="tls"><span class="tab-no">02</span><span class="tab-title">Transport Layer Security</span><span class="tab-dot" data-dot="tls">✓</span></a></li>
       <li><a href="#ipsec" data-topic="ipsec"><span class="tab-no">03</span><span class="tab-title">IP Security (IPSec)</span><span class="tab-dot" data-dot="ipsec">✓</span></a></li>
@@ -751,6 +753,32 @@ html[data-theme="dark"] .archive-list .ext-badge.pptx { background:#352510; colo
 
   <main class="content" id="content">
     <div class="content-inner">
+
+      <section class="welcome-hero" id="welcome" aria-labelledby="welcome-heading">
+        <div class="welcome-shell">
+          <div class="welcome-copy">
+            <div class="welcome-eyebrow"><i class="fa-solid fa-shield-halved"></i> Secure learning portal</div>
+            <h1 id="welcome-heading">Welcome to Information Network Security (INS) E-Notes</h1>
+            <p class="welcome-subtitle">Your complete course companion — all materials in one place</p>
+            <div class="welcome-features">
+              <div class="feature-pill"><i class="fa-solid fa-file-pdf"></i><span>PDF Notes — all lectures attached</span></div>
+              <div class="feature-pill"><i class="fa-solid fa-file-powerpoint"></i><span>Slides &amp; PPTs — topic-wise decks</span></div>
+              <div class="feature-pill"><i class="fa-solid fa-clipboard-list"></i><span>Class Work — exercises and tasks</span></div>
+              <div class="feature-pill"><i class="fa-solid fa-brain"></i><span>MCQ Quizzes — activity-based interactive learning</span></div>
+            </div>
+            <div class="welcome-actions">
+              <button class="welcome-btn primary" id="startDossierBtn" type="button"><i class="fa-solid fa-rocket"></i> Start exploring</button>
+              <button class="welcome-btn secondary" id="jumpFirstTopicBtn" type="button"><i class="fa-solid fa-arrow-right"></i> Jump to first topic</button>
+            </div>
+          </div>
+          <div class="welcome-visual" aria-hidden="true">
+            <div class="orb"></div>
+            <i class="fa-solid fa-shield-halved shield-icon"></i>
+            <div class="welcome-caption">Cybersecurity • Notes • Quizzes</div>
+          </div>
+        </div>
+        <div class="welcome-footer">Instructor: Hafiz Muhammad Attaullah | Course: INS · BSSE · MAJU</div>
+      </section>
 
       <section class="topic" id="db-security" data-title="Database Security">
         <div class="topic-head">
@@ -2358,6 +2386,7 @@ html[data-theme="dark"] .archive-list .ext-badge.pptx { background:#352510; colo
 
   var TOPIC_ORDER = ["db-security","tls","ipsec","ids","firewall-vpn","auth-vuln","kerberos","msg-auth","digital-sig","cloud-threats","key-exchange"];
   var topics = Array.prototype.slice.call(document.querySelectorAll(".topic"));
+  var welcomeEl = document.getElementById("welcome");
   var tocLinks = Array.prototype.slice.call(document.querySelectorAll(".toc a[data-topic]"));
   var sidebar = document.getElementById("sidebar");
   var scrim = document.getElementById("scrim");
@@ -2394,6 +2423,16 @@ html[data-theme="dark"] .archive-list .ext-badge.pptx { background:#352510; colo
   }
 
   /* ---------- topic switching ---------- */
+  function showWelcome(){
+    topics.forEach(function(sec){ sec.classList.remove("active"); });
+    if(welcomeEl) welcomeEl.classList.remove("hidden");
+    tocLinks.forEach(function(a){ a.classList.remove("active"); });
+    if(history.replaceState) history.replaceState(null, "", window.location.pathname + window.location.search);
+    contentEl.scrollTo({top:0, behavior:"auto"});
+    closeSidebar();
+    updateFooterButtons(null);
+  }
+
   function showTopic(id, opts){
     opts = opts || {};
     var found = false;
@@ -2403,6 +2442,7 @@ html[data-theme="dark"] .archive-list .ext-badge.pptx { background:#352510; colo
       sec.classList.toggle("active", on);
     });
     if(!found){ id = TOPIC_ORDER[0]; topics.forEach(function(sec){ sec.classList.toggle("active", sec.id===id); }); }
+    if(welcomeEl) welcomeEl.classList.add("hidden");
     tocLinks.forEach(function(a){ a.classList.toggle("active", a.dataset.topic === id); });
     if(history.replaceState) history.replaceState(null, "", "#"+id);
     if(!opts.noScroll) contentEl.scrollTo({top:0, behavior:"auto"});
@@ -2435,6 +2475,11 @@ html[data-theme="dark"] .archive-list .ext-badge.pptx { background:#352510; colo
       showTopic(a.dataset.topic);
     });
   });
+
+  var startDossierBtn = document.getElementById("startDossierBtn");
+  var jumpFirstTopicBtn = document.getElementById("jumpFirstTopicBtn");
+  if(startDossierBtn){ startDossierBtn.addEventListener("click", function(){ showTopic(TOPIC_ORDER[0]); }); }
+  if(jumpFirstTopicBtn){ jumpFirstTopicBtn.addEventListener("click", function(){ showTopic(TOPIC_ORDER[0]); }); }
 
   document.addEventListener("click", function(e){
     var btn = e.target.closest("[data-nav]");
@@ -2624,11 +2669,13 @@ html[data-theme="dark"] .archive-list .ext-badge.pptx { background:#352510; colo
       try{ reviewed = val ? JSON.parse(val) : []; } catch(e){ reviewed = []; }
       updateProgressUI();
     });
-    storageGet("last-topic").then(function(last){
-      var hash = location.hash.replace("#","");
-      var start = hash && TOPIC_ORDER.indexOf(hash) !== -1 ? hash : (last && TOPIC_ORDER.indexOf(last) !== -1 ? last : TOPIC_ORDER[0]);
-      showTopic(start, {noScroll:true});
-    });
+
+    var hash = location.hash.replace("#","");
+    if(hash && TOPIC_ORDER.indexOf(hash) !== -1){
+      showTopic(hash, {noScroll:true});
+    } else {
+      showWelcome();
+    }
   }
   init();
 
