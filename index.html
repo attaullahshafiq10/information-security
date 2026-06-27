@@ -547,6 +547,209 @@ html[data-theme="dark"] .archive-list .ext-badge.pptx { background:#352510; colo
   transition: background .15s ease;
 }
 .classwork-link:hover { background: var(--signal-soft); border-left-color: var(--stamp); }
+/* ============================================================
+   WELCOME HERO
+   ============================================================ */
+.welcome-hero {
+  padding: 64px 0 52px;
+    margin-bottom: 24px;
+    border-bottom: 2px solid var(--line);
+
+.welcome-shell {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 48px;
+  align-items: center;
+  margin-bottom: 36px;
+}
+
+/* Left — copy */
+.welcome-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11.5px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--signal);
+  border: 1px solid var(--signal);
+  border-radius: 99px;
+  padding: 4px 13px;
+  margin-bottom: 22px;
+}
+
+.welcome-hero h1 {
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -.02em;
+  margin: 0 0 14px;
+  max-width: 520px;
+}
+
+.welcome-subtitle {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  color: var(--ink-soft);
+  margin: 0 0 30px;
+  line-height: 1.6;
+}
+
+.welcome-features {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 32px;
+}
+
+.feature-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  color: var(--ink-soft);
+  transition: border-color .18s ease, color .18s ease;
+}
+
+.feature-pill:hover {
+  border-color: var(--signal);
+  color: var(--ink);
+}
+
+.feature-pill i {
+  color: var(--signal);
+  font-size: 15px;
+  flex: 0 0 auto;
+}
+
+.welcome-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.welcome-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  padding: 10px 20px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background .18s ease, border-color .18s ease, color .18s ease;
+}
+
+.welcome-btn.primary {
+  background: var(--ink);
+  color: var(--paper);
+  border: 1px solid var(--ink);
+}
+
+.welcome-btn.primary:hover {
+  background: var(--signal);
+  border-color: var(--signal);
+}
+
+.welcome-btn.secondary {
+  background: var(--paper-raised);
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+
+.welcome-btn.secondary:hover {
+  border-color: var(--signal);
+  color: var(--signal);
+}
+
+/* Right — visual */
+.welcome-visual {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  height: 280px;
+}
+
+.orb {
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  border: 1.5px dashed var(--line);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.orb::before {
+  content: "";
+  position: absolute;
+  inset: 18px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+}
+
+.shield-icon {
+  position: relative;
+  font-size: 80px;
+  color: var(--signal);
+  filter: drop-shadow(0 0 28px color-mix(in srgb, var(--signal) 22%, transparent));
+  z-index: 1;
+}
+
+.welcome-caption {
+  position: relative;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  z-index: 1;
+}
+
+/* Footer */
+.welcome-footer {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11.5px;
+  color: var(--ink-soft);
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+  letter-spacing: .04em;
+}
+
+/* Responsive */
+@media (max-width: 760px) {
+  .welcome-shell {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+  .welcome-visual {
+    height: 180px;
+  }
+  .orb {
+    width: 150px;
+    height: 150px;
+  }
+  .shield-icon {
+    font-size: 56px;
+  }
+  .welcome-hero h1 {
+    font-size: 26px;
+  }
+  .welcome-features {
+    grid-template-columns: 1fr;
+  }
+}
 </style>
 </head>
 <body>
@@ -767,8 +970,7 @@ html[data-theme="dark"] .archive-list .ext-badge.pptx { background:#352510; colo
               <div class="feature-pill"><i class="fa-solid fa-brain"></i><span>MCQ Quizzes — activity-based interactive learning</span></div>
             </div>
             <div class="welcome-actions">
-              <button class="welcome-btn primary" id="startDossierBtn" type="button"><i class="fa-solid fa-rocket"></i> Start exploring</button>
-              <button class="welcome-btn secondary" id="jumpFirstTopicBtn" type="button"><i class="fa-solid fa-arrow-right"></i> Jump to first topic</button>
+              <button class="welcome-btn primary" id="startDossierBtn" type="button"><i class="fa-solid fa-rocket"></i> Visit Database Security</button>
             </div>
           </div>
           <div class="welcome-visual" aria-hidden="true">
