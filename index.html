@@ -552,8 +552,14 @@ html[data-theme="dark"] .archive-list .ext-badge.pptx { background:#352510; colo
    ============================================================ */
 .welcome-hero {
   padding: 64px 0 52px;
-    margin-bottom: 24px;
-    border-bottom: 2px solid var(--line);
+  margin-bottom: 24px;
+  border-bottom: 2px solid var(--line);
+  animation: fadein .3s ease;
+}
+
+.welcome-hero.hidden {
+  display: none;
+}
 
 .welcome-shell {
   display: grid;
